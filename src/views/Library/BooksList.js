@@ -1,9 +1,9 @@
 import React, { useEffect, useState} from 'react';
 import {View, Text, TouchableHighlight, StyleSheet} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
-import BookListItem from '../components/Book/BookListItem';
+import BookListItem from '../../components/Book/BookListItem';
 
-import { useQuery } from 'react-query'
+import { useQuery } from 'react-query';
 
 const styles = StyleSheet.create({
   results: {
@@ -28,11 +28,10 @@ async function fetchData() {
 
 const Home = ({navigation}) => {
   const handleOnPress = () => {
-    navigation.navigate('Library');
+    navigation.navigate('BookDetails');
   }
 
   const {status, data, error} = useQuery(GET_BOOKS, fetchData);
-  console.log(data);
 
   return (
     <View style={styles.results}>

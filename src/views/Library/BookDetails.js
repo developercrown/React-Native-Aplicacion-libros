@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-const Library = () => {
+const BookDetails = () => {
     return (
         <View>
-            <Text>Libreria</Text>
+            <Text>Detalles del libro</Text>
         </View>
     );
 }
 
-export default Library;
+export default BookDetails;
