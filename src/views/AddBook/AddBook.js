@@ -1,9 +1,14 @@
 import React, {useState} from 'react';
 import {View, Text, SafeAreaView, TextInput, Button, StyleSheet} from 'react-native';
 
-import { useQuery, useMutation, queryCache } from 'react-query'
+import { useMutation } from 'react-query'
+
+import useLibraryContext from '../../hooks/useLibraryContext';
 
 const styles = StyleSheet.create({
+    label: {
+      marginTop: 10 
+    },
     form: {
         paddingHorizontal: 16,
 
@@ -16,10 +21,10 @@ const styles = StyleSheet.create({
     }
 });
 
-const GET_BOOKS = 'GET_BOOKS';
+const SERVER = 'https://crud.upn164.edu.mx/api'
 
 async function postData(data) { 
-    const response = await fetch('http://127.0.0.1:8000/api/books', {
+    const response = await fetch(`${SERVER}/libros`, {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
@@ -33,20 +38,31 @@ async function postData(data) {
 
 const AddBook = () => {
   const [title, setTitle] = useState(null);
+  const [autor, setAutor] = useState(null);
+  const {invalidateBooksListCache} = useLibraryContext();
 
   async function handleSubmit() {
-    //   mutate(title);
-    alert(title)
+    mutate({
+      titulo: title,
+      autor: autor
+    });
   }
 
   const [ mutate, {isLoading} ] = useMutation(postData, {
-      onSuccess: queryCache.invalidateQueries('GET_BOOKS')
+      onSuccess: () => {
+        invalidateBooksListCache();
+        setTitle('');
+        setAutor('');
+      }
   });
 
   return (
     <SafeAreaView>
       <View style={styles.form}>
+        <Text style={styles.label}>Nombre del libro</Text>
         <TextInput onChangeText={text=>setTitle(text)} style={styles.textInput} value={title}/>
+        <Text style={styles.label}>Nombre del autor</Text>
+        <TextInput onChangeText={text=>setAutor(text)} style={styles.textInput} value={autor}/>
         <Button onPress={handleSubmit} title="Guardar"/>
         {isLoading && <Text>Guardando...</Text>}
       </View>

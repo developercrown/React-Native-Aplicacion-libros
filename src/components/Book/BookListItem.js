@@ -68,15 +68,15 @@ const BookListItem = ({book, onPress}) => {
     <TouchableOpacity onPress={onPress}>
       <View style={styles.row}>
         <View style={styles.firstRow}>
-          <Image source={{uri: book.cover}} style={styles.image} />
+          <Image source={{uri: book.uri}} style={styles.image} />
         </View>
         <View style={styles.secondRow}>
           <View style={styles.contentRow}>
-            <Text>{book.title}</Text>
+            <Text>{book.titulo}</Text>
           </View>
           <View style={styles.contentRow}>
             <Icon name="library-outline" />
-            <Text style={styles.boldText}>Author: {book.author}</Text>
+            <Text style={styles.boldText}>Author: {book.autor}</Text>
           </View>
         </View>
         <View style={styles.thirdRow}>

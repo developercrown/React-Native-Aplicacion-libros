@@ -1,9 +1,9 @@
-import React, { useEffect, useState} from 'react';
-import {View, Text, TouchableHighlight, StyleSheet} from 'react-native';
+import React from 'react';
+import {View, Text, StyleSheet} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import BookListItem from '../../components/Book/BookListItem';
 
-import { useQuery } from 'react-query';
+import useLibraryContext from '../../hooks/useLibraryContext';
 
 const styles = StyleSheet.create({
   results: {
@@ -16,27 +16,17 @@ const styles = StyleSheet.create({
   },
 });
 
-const GET_BOOKS = 'GET_BOOKS';
-
-async function fetchData() {
-  // const response = await fetch('http://archivos.upn164.edu.mx/develop/books.json');
-  const response = await fetch('https://www.etnassoft.com/api/v1/get/?category=libros_programacion');
-  const json = await response.json();
-  return json;
-}
-
-
 const Home = ({navigation}) => {
   const handleOnPress = () => {
     navigation.navigate('BookDetails');
   }
 
-  const {status, data, error} = useQuery(GET_BOOKS, fetchData);
+  const {isSuccess, isLoading, books} = useLibraryContext();
 
   return (
     <View style={styles.results}>
       <FlatList
-        data={status === 'success' ? data : []}
+        data={isSuccess ? books : []}
         renderItem={({item}) => <BookListItem book={item} onPress={handleOnPress}/>}
         keyExtractor={(item, index) => `list-item${item}${index}`}
         ListHeaderComponent={
@@ -47,7 +37,7 @@ const Home = ({navigation}) => {
         ListEmptyComponent={
           <View>
             {
-              status === 'loading' && <View><Text>Cargando Libros...</Text></View>
+              isLoading && <View><Text>Cargando Libros...</Text></View>
             }
           </View>
         }

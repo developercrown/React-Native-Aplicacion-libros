@@ -12,6 +12,8 @@ import BookDetails from './src/views/Library/BookDetails';
 import AddBook from './src/views/AddBook/AddBook';
 import {StyleSheet} from 'react-native';
 
+import {LibraryContextProvider} from './src/contexts/LibraryContext';
+
 const Tab = createBottomTabNavigator();
 
 const LibraryStack = createStackNavigator();
@@ -40,29 +42,31 @@ const styles = StyleSheet.create({
 });
 
 const App = () => (
-  <NavigationContainer>
-    <Tab.Navigator
-      style={styles.tab}
-      screenOptions={({route}) => ({
-        tabBarIcon: ({focused, color, size}) => {
-          let iconName;
+  <LibraryContextProvider>
+    <NavigationContainer>
+      <Tab.Navigator
+        style={styles.tab}
+        screenOptions={({route}) => ({
+          tabBarIcon: ({focused, color, size}) => {
+            let iconName;
 
-          if (route.name === 'Biblioteca') {
-            iconName = focused ? 'book' : 'bookmarks';
-          } else if (route.name === 'Agregar') {
-            iconName = focused ? 'add-circle' : 'add';
-          }
-          return <Icon name={iconName} size={size} color={color} />;
-        },
-      })}
-      tabBarOptions={{
-        activeTintColor: 'blue',
-        inactiveTintColor: 'gray',
-      }}>
-      <Tab.Screen name="Biblioteca" component={LibraryStackScreen} />
-      <Tab.Screen name="Agregar" component={AddBook} />
-    </Tab.Navigator>
-  </NavigationContainer>
+            if (route.name === 'Biblioteca') {
+              iconName = focused ? 'book' : 'bookmarks';
+            } else if (route.name === 'Agregar') {
+              iconName = focused ? 'add-circle' : 'add';
+            }
+            return <Icon name={iconName} size={size} color={color} />;
+          },
+        })}
+        tabBarOptions={{
+          activeTintColor: 'blue',
+          inactiveTintColor: 'gray',
+        }}>
+        <Tab.Screen name="Biblioteca" component={LibraryStackScreen} />
+        <Tab.Screen name="Agregar" component={AddBook} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  </LibraryContextProvider>
 );
 
 export default App;
