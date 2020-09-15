@@ -3,6 +3,8 @@ import {View, Text, SafeAreaView, TextInput, Button, StyleSheet} from 'react-nat
 
 import { useMutation } from 'react-query'
 
+import ImagePicker from 'react-native-image-picker';
+
 import useLibraryContext from '../../hooks/useLibraryContext';
 
 const styles = StyleSheet.create({
@@ -20,6 +22,15 @@ const styles = StyleSheet.create({
         marginVertical: 20
     }
 });
+
+const options = {
+  title: 'Elije tu Avatar',
+  customButtons: [{ name: 'fb', title: 'Elije tu imagen desde facebook' }],
+  storageOptions: {
+    skipBackup: true,
+    path: 'images',
+  }
+}
 
 const SERVER = 'https://crud.upn164.edu.mx/api'
 
