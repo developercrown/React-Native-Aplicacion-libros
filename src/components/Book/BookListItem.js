@@ -3,7 +3,7 @@ import {Image, View, Text, StyleSheet} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import Icon from 'react-native-ionicons';
-import {startClock} from 'react-native-reanimated';
+import nofile from '../../assets/nofile.jpg';
 
 const styles = StyleSheet.create({
   row: {
@@ -64,11 +64,19 @@ const styles = StyleSheet.create({
 });
 
 const BookListItem = ({book, onPress}) => {
+
+  let uri = book.uri;
+
+  if(!uri || uri == "") {
+    uri = null;
+  }
+
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.row}>
         <View style={styles.firstRow}>
-          <Image source={{uri: book.uri}} style={styles.image} />
+          {uri && <Image source={{uri: uri}} style={styles.image} />}
+          {!uri && <Image source={nofile} style={styles.image} />}
         </View>
         <View style={styles.secondRow}>
           <View style={styles.contentRow}>
