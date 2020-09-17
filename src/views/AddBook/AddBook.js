@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import {useMutation} from 'react-query';
+import { useMutation } from 'react-query';
 import Icon from 'react-native-ionicons';
 
 import ImagePicker from 'react-native-image-picker';
 
 import useLibraryContext from '../../hooks/useLibraryContext';
+
+import RNFetchBlob from 'react-native-fetch-blob'
 
 import nofile from '../../assets/nofile.jpg';
 
@@ -80,68 +82,57 @@ const options = {
   },
 };
 
-const SERVER_URI = 'http://192.168.10.101:8088/api';
+const SERVER_URI = 'http://192.168.10.100:8088/api';
 
 async function postData(data) {
-  const body = new FormData();
 
-  // console.log('testing', data.image);
+  // const body = new FormData();
+  // body.append('titulo', data.titulo);
+  // body.append('autor', data.autor);
 
-  body.append('titulo', data.titulo);
-  body.append('autor', data.autor);
-  // body.append('image', data.image);
-
-  let res = await fetch(`${SERVER_URI}/libros`, {
-    method: 'post',
-    body: body,
-    headers: {
-      'Content-Type': 'multipart/form-data; ',
-    },
+  RNFetchBlob.fetch(
+    'POST',
+    `${SERVER_URI}/libros`,
+    {
+      'Content-Type': 'multipart/form-data',
+    }, [
+      { name: 'portada', filename: 'portada.jpg', type: 'image/jpg', data: data.image.data },
+      { name: 'titulo', data: data.titulo},
+      { name: 'autor', data: data.autor}
+    ]).then((resp) => {
+      alert('Registrado');
+    console.log('response', resp);
+  }).catch((err) => {
+    alert('Error!');
+    console.log('error', err);
   });
-  let responseJson = await res.json();
-  if (responseJson.status == 1) {
-    alert('Upload Successful');
-  }
-
-  // const response = await fetch(`${SERVER_URI}/libros`, {
-  //   method: 'POST',
-  //   body,
-  //   headers: {
-  //     'Content-Type': 'multipart/form-data; ',
-  //   },
-  // });
-  // const json = await response.json();
-  // return json;
 }
 
 const AddBook = () => {
   const [title, setTitle] = useState('');
   const [autor, setAutor] = useState('');
   const [image, setImage] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
 
-  const {invalidateBooksListCache} = useLibraryContext();
+  const { invalidateBooksListCache } = useLibraryContext();
 
   async function handleSubmit() {
     mutate({
       titulo: title,
       autor: autor,
-      image: imageFile, //TODO: Pendiente subir la imagen al servidor
+      image: image, //TODO: Pendiente subir la imagen al servidor
     });
   }
 
-  const [mutate, {isLoading}] = useMutation(postData, {
+  const [mutate, { isLoading }] = useMutation(postData, {
     onSuccess: () => {
       invalidateBooksListCache();
-      setTitle('');
-      setAutor('');
+      // setTitle('');
+      // setAutor('');
     },
   });
 
   const launchImagePicker = () => {
     ImagePicker.showImagePicker(options, (response) => {
-      // console.log('Response: ', response);
-
       if (response.didCancel) {
         console.log('Cancelada la selección');
       } else if (response.error) {
@@ -152,13 +143,9 @@ const AddBook = () => {
           response.customButton,
         );
       } else {
-        console.log('fotografia capturada', response);
-        const source = {uri: `data:${response.type};base64,${response.data}`};
-        // const file = response;
-        setImageFile(response);
+        // console.log('fotografia capturada', response);
+        const source = { uri: `data:${response.type};base64,${response.data}`, data: response.data };
         setImage(source);
-
-        // console.log('archivo', file);
       }
     });
   };

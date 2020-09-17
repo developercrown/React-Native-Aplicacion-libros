@@ -7,7 +7,7 @@ export default LibraryContext;
 
 const GET_BOOKS = 'GET_BOOKS';
 // const SERVER_URI = 'https://crud.upn164.edu.mx/api';
-const SERVER_URI = 'http://192.168.10.101:8088/api';
+const SERVER_URI = 'http://192.168.10.100:8088/api';
 
 async function fetchData() {
     const response = await fetch(`${SERVER_URI}/libros`);
