@@ -6,10 +6,11 @@ const LibraryContext = createContext();
 export default LibraryContext;
 
 const GET_BOOKS = 'GET_BOOKS';
-const SERVER = 'https://crud.upn164.edu.mx/api';
+// const SERVER_URI = 'https://crud.upn164.edu.mx/api';
+const SERVER_URI = 'http://192.168.10.101:8088/api';
 
 async function fetchData() {
-    const response = await fetch(`${SERVER}/libros`);
+    const response = await fetch(`${SERVER_URI}/libros`);
     const json = await response.json();
     return json;
 }

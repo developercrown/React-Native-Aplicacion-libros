@@ -67,32 +67,58 @@ const styles = StyleSheet.create({
 });
 
 const options = {
-  title: 'Elije tu Avatar',
-  customButtons: [{name: 'fb', title: 'Elije tu imagen desde facebook'}],
+  title: 'Elije la portada',
+  cancelButtonTitle: 'Cancelar',
+  takePhotoButtonTitle: 'Capturar Fotografia',
+  chooseFromLibraryButtonTitle: 'Elegir desde la galeria',
+  mediaType: 'photo',
+  noData: false,
+  customButtons: [],
   storageOptions: {
     skipBackup: true,
     path: 'images',
   },
 };
 
-const SERVER = 'https://crud.upn164.edu.mx/api';
+const SERVER_URI = 'http://192.168.10.101:8088/api';
 
 async function postData(data) {
-  const response = await fetch(`${SERVER}/libros`, {
-    method: 'POST',
-    body: JSON.stringify(data),
+  const body = new FormData();
+
+  // console.log('testing', data.image);
+
+  body.append('titulo', data.titulo);
+  body.append('autor', data.autor);
+  // body.append('image', data.image);
+
+  let res = await fetch(`${SERVER_URI}/libros`, {
+    method: 'post',
+    body: body,
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'multipart/form-data; ',
     },
   });
-  const json = await response.json();
-  return json;
+  let responseJson = await res.json();
+  if (responseJson.status == 1) {
+    alert('Upload Successful');
+  }
+
+  // const response = await fetch(`${SERVER_URI}/libros`, {
+  //   method: 'POST',
+  //   body,
+  //   headers: {
+  //     'Content-Type': 'multipart/form-data; ',
+  //   },
+  // });
+  // const json = await response.json();
+  // return json;
 }
 
 const AddBook = () => {
   const [title, setTitle] = useState('');
   const [autor, setAutor] = useState('');
   const [image, setImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
   const {invalidateBooksListCache} = useLibraryContext();
 
@@ -100,7 +126,7 @@ const AddBook = () => {
     mutate({
       titulo: title,
       autor: autor,
-      image: image.uri //TODO: Pendiente subir la imagen al servidor
+      image: imageFile, //TODO: Pendiente subir la imagen al servidor
     });
   }
 
@@ -126,9 +152,13 @@ const AddBook = () => {
           response.customButton,
         );
       } else {
-        //console.log(response, response.data);
-        const source = {uri: `data:image/jpeg;base64,${response.data}`};
+        console.log('fotografia capturada', response);
+        const source = {uri: `data:${response.type};base64,${response.data}`};
+        // const file = response;
+        setImageFile(response);
         setImage(source);
+
+        // console.log('archivo', file);
       }
     });
   };
