@@ -17,8 +17,8 @@ const styles = StyleSheet.create({
 });
 
 const Home = ({navigation}) => {
-  const handleOnPress = () => {
-    navigation.navigate('BookDetails');
+  const handleOnPress = ({ bookId }) => {
+    navigation.navigate('BookDetails', { bookId });
   }
 
   const {isSuccess, isLoading, books} = useLibraryContext();
@@ -27,7 +27,7 @@ const Home = ({navigation}) => {
     <View style={styles.results}>
       <FlatList
         data={isSuccess ? books : []}
-        renderItem={({item}) => <BookListItem book={item} onPress={handleOnPress}/>}
+        renderItem={({item}) => <BookListItem book={item} onPress={()=>handleOnPress({bookId: item.id})}/>}
         keyExtractor={(item, index) => `list-item${item}${index}`}
         ListHeaderComponent={
           <View style={styles.rowHeader}>

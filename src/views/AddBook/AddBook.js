@@ -82,31 +82,30 @@ const options = {
   },
 };
 
-const SERVER_URI = 'http://192.168.10.100:8088/api';
+const SERVER_URI = 'http://192.168.10.101:8088/api';
 
 async function postData(data) {
-
-  // const body = new FormData();
-  // body.append('titulo', data.titulo);
-  // body.append('autor', data.autor);
-
-  RNFetchBlob.fetch(
+  return await RNFetchBlob.fetch(
     'POST',
     `${SERVER_URI}/libros`,
     {
       'Content-Type': 'multipart/form-data',
     }, [
-      { name: 'portada', filename: 'portada.jpg', type: 'image/jpg', data: data.image.data },
-      { name: 'titulo', data: data.titulo},
-      { name: 'autor', data: data.autor}
-    ]).then((resp) => {
-      alert('Registrado');
-    console.log('response', resp);
+    { name: 'portada', filename: 'portada.jpg', type: 'image/jpg', data: data.image.data },
+    { name: 'titulo', data: data.titulo },
+    { name: 'autor', data: data.autor }
+  ]).uploadProgress({ interval: 250 }, (written, total) => {
+    console.log('uploaded', written / total)
+  }).then((response) => {
+    // console.log('response', response);
+    return response;
   }).catch((err) => {
-    alert('Error!');
     console.log('error', err);
+    return error
   });
 }
+
+const notEmptyText = (text = '') => text.trim() != '';
 
 const AddBook = () => {
   const [title, setTitle] = useState('');
@@ -116,34 +115,44 @@ const AddBook = () => {
   const { invalidateBooksListCache } = useLibraryContext();
 
   async function handleSubmit() {
-    mutate({
-      titulo: title,
-      autor: autor,
-      image: image, //TODO: Pendiente subir la imagen al servidor
-    });
+    if (notEmptyText(title) && notEmptyText(autor)) {
+      mutate({
+        titulo: title,
+        autor,
+        image: image ? image : nofile
+      });
+    } else {
+      alert('No haz completado la información');
+    }
   }
 
   const [mutate, { isLoading }] = useMutation(postData, {
-    onSuccess: () => {
-      invalidateBooksListCache();
-      // setTitle('');
-      // setAutor('');
+    onSuccess: (result) => {
+      const {status} = result.respInfo;
+      console.log('success', result);
+      if (status ===200 || status == 201) {
+        invalidateBooksListCache();
+        setTitle('');
+        setAutor('');
+        setImage(null);
+        alert('Registrado correctamente');
+      } else {
+        alert('Error al registrar');
+      }
     },
   });
 
   const launchImagePicker = () => {
     ImagePicker.showImagePicker(options, (response) => {
       if (response.didCancel) {
-        console.log('Cancelada la selección');
+        alert('Proceso cancelado');
       } else if (response.error) {
-        console.log('Ocurrio un error al elegir la imagen', response.error);
+        alert('Ocurrio un error al elegir la imagen');
+        console.log(response.error);
       } else if (response.customButton) {
-        console.log(
-          'El usuario eligio un boton personalizado',
-          response.customButton,
-        );
+        alert('El usuario eligio un boton personalizado');
+        console.log(response.customButton);
       } else {
-        // console.log('fotografia capturada', response);
         const source = { uri: `data:${response.type};base64,${response.data}`, data: response.data };
         setImage(source);
       }

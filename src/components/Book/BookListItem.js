@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   image: {
     width: 50,
     height: 50,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
     alignSelf: 'center',
   },
   icon: {
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const SERVER_URI = 'http://192.168.10.100:8088/api';
+const SERVER_URI = 'http://192.168.10.101:8088/api';
 
 const BookListItem = ({book, onPress}) => {
 
@@ -79,7 +79,6 @@ const BookListItem = ({book, onPress}) => {
         <View style={styles.firstRow}>
           {uri && <Image source={{uri: `${SERVER_URI}/libros/image/${book.id}/${uri}/${book.uri_key}/thumb`}} style={styles.image} />}
           {!uri && <Image source={nofile} style={styles.image} />}
-          {/* {!uri && <Image source={{uri: `${SERVER_URI}/libros/image/8/9147369.png/1600313683`}} style={styles.image} />} */}
         </View>
         <View style={styles.secondRow}>
           <View style={styles.contentRow}>
