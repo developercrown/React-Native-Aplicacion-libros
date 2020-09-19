@@ -9,14 +9,34 @@ import Icon from 'react-native-ionicons';
 
 import BookList from './src/views/Library/BooksList';
 import BookDetails from './src/views/Library/BookDetails';
+import BookEdit from './src/views/Library/BookEdit';
 import AddBook from './src/views/AddBook/AddBook';
+import SelectCategory from './src/views/Category/SelectCategory';
 import {StyleSheet} from 'react-native';
 
 import {LibraryContextProvider} from './src/contexts/LibraryContext';
 
 const Tab = createBottomTabNavigator();
 
+const LibraryRootStack = createStackNavigator();
 const LibraryStack = createStackNavigator();
+
+
+const LibraryRootStackScreen = () => {
+  return (
+    <LibraryRootStack.Navigator mode="modal">
+      <LibraryRootStack.Screen
+        name="LibraryStackScreen"
+        component={LibraryStackScreen}
+        options={{headerShown: false}}
+      />
+      <LibraryRootStack.Screen
+        name="SelectCategoryModal"
+        component={SelectCategory}
+      />
+    </LibraryRootStack.Navigator>
+  );
+}
 
 const LibraryStackScreen = () => {
   return (
@@ -31,9 +51,15 @@ const LibraryStackScreen = () => {
         component={BookDetails}
         options={{title: 'Detalles'}}
       />
+      <LibraryStack.Screen
+        name="BookEdit"
+        component={BookEdit}
+        options={{title: 'Modo de edición'}}
+      />
     </LibraryStack.Navigator>
   );
 };
+
 
 const styles = StyleSheet.create({
   tab: {
@@ -62,7 +88,7 @@ const App = () => (
           activeTintColor: 'blue',
           inactiveTintColor: 'gray',
         }}>
-        <Tab.Screen name="Biblioteca" component={LibraryStackScreen} />
+        <Tab.Screen name="Biblioteca" component={LibraryRootStackScreen} />
         <Tab.Screen name="Agregar" component={AddBook} />
       </Tab.Navigator>
     </NavigationContainer>

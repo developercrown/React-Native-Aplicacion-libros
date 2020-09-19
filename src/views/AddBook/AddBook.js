@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -8,16 +8,18 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  ToastAndroid,
+  Vibration,
 } from 'react-native';
 
-import { useMutation } from 'react-query';
+import {useMutation} from 'react-query';
 import Icon from 'react-native-ionicons';
 
 import ImagePicker from 'react-native-image-picker';
 
 import useLibraryContext from '../../hooks/useLibraryContext';
 
-import RNFetchBlob from 'react-native-fetch-blob'
+import RNFetchBlob from 'react-native-fetch-blob';
 
 import nofile from '../../assets/nofile.jpg';
 
@@ -90,20 +92,39 @@ async function postData(data) {
     `${SERVER_URI}/libros`,
     {
       'Content-Type': 'multipart/form-data',
-    }, [
-    { name: 'portada', filename: 'portada.jpg', type: 'image/jpg', data: data.image.data },
-    { name: 'titulo', data: data.titulo },
-    { name: 'autor', data: data.autor }
-  ]).uploadProgress({ interval: 250 }, (written, total) => {
-    console.log('uploaded', written / total)
-  }).then((response) => {
-    // console.log('response', response);
-    return response;
-  }).catch((err) => {
-    console.log('error', err);
-    return error
-  });
+    },
+    [
+      {
+        name: 'portada',
+        filename: 'portada.jpg',
+        type: 'image/jpg',
+        data: data.image.data,
+      },
+      {name: 'titulo', data: data.titulo},
+      {name: 'autor', data: data.autor},
+    ],
+  )
+    .uploadProgress({interval: 250}, (written, total) => {
+      console.log('uploaded', written / total);
+    })
+    .then((response) => {
+      // console.log('response', response);
+      return response;
+    })
+    .catch((err) => {
+      console.log('error', err);
+      return error;
+    });
 }
+
+const vibrationSingle = () => Vibration.vibrate([35, 20], false);
+const vibrationSuccess = () => Vibration.vibrate([100, 75, 100, 75], false);
+const vibrationError = () => Vibration.vibrate([100, 75, 100, 75, 100, 75], false);
+const toastMessage = (message = 'hello') => ToastAndroid.show(
+  message,
+  ToastAndroid.SHORT,
+  ToastAndroid.BOTTOM,
+);;
 
 const notEmptyText = (text = '') => text.trim() != '';
 
@@ -112,49 +133,57 @@ const AddBook = () => {
   const [autor, setAutor] = useState('');
   const [image, setImage] = useState(null);
 
-  const { invalidateBooksListCache } = useLibraryContext();
+  const {invalidateBooksListCache} = useLibraryContext();
 
   async function handleSubmit() {
+    vibrationSingle();
     if (notEmptyText(title) && notEmptyText(autor)) {
       mutate({
         titulo: title,
         autor,
-        image: image ? image : nofile
+        image: image ? image : nofile,
       });
     } else {
-      alert('No haz completado la información');
+      vibrationError();
+      toastMessage('No haz completado la información');
     }
   }
 
-  const [mutate, { isLoading }] = useMutation(postData, {
+  const [mutate, {isLoading}] = useMutation(postData, {
     onSuccess: (result) => {
       const {status} = result.respInfo;
       console.log('success', result);
-      if (status ===200 || status == 201) {
+      if (status === 200 || status == 201) {
         invalidateBooksListCache();
         setTitle('');
         setAutor('');
         setImage(null);
-        alert('Registrado correctamente');
+        vibrationSuccess();
+        toastMessage('Registrado correctamente');
       } else {
-        alert('Error al registrar');
+        toastMessage('Error al registrar');
+        vibrationError();
       }
     },
   });
 
   const launchImagePicker = () => {
+    vibrationSingle();
     ImagePicker.showImagePicker(options, (response) => {
       if (response.didCancel) {
-        alert('Proceso cancelado');
+        toastMessage('Proceso cancelado');
       } else if (response.error) {
-        alert('Ocurrio un error al elegir la imagen');
-        console.log(response.error);
+        toastMessage('Ocurrio un error al elegir la imagen');
+        vibrationError();
       } else if (response.customButton) {
-        alert('El usuario eligio un boton personalizado');
-        console.log(response.customButton);
+        toastMessage('El usuario eligio un boton personalizado');
       } else {
-        const source = { uri: `data:${response.type};base64,${response.data}`, data: response.data };
+        const source = {
+          uri: `data:${response.type};base64,${response.data}`,
+          data: response.data,
+        };
         setImage(source);
+        vibrationSingle();
       }
     });
   };
