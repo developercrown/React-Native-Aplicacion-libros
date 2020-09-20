@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, StatusBar} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, StatusBar, Text, View} from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -11,6 +11,10 @@ import BookEdit from './src/views/Library/BookEdit';
 import AddBook from './src/views/AddBook/AddBook';
 import SelectCategory from './src/views/Category/SelectCategory';
 import {LibraryContextProvider} from './src/contexts/LibraryContext';
+
+import {useAsyncStorage} from '@react-native-community/async-storage';
+
+import ConfigApp from './src/views/ConfigApp/ConfigApp';
 
 const Tab = createBottomTabNavigator();
 const LibraryRootStack = createStackNavigator();
@@ -54,36 +58,57 @@ const LibraryStackScreen = () => {
   );
 };
 
+
 const App = () => {
+  const {getItem} = useAsyncStorage('server');
+  const [server, setServer] = useState(null);
+
+  const init = async () => {
+    console.log('inicializando');
+    let tmp = await getItem();
+    setServer(tmp);
+    
+    setTimeout(() => {
+      hideSplash();
+    }, 1000);
+
+    
+  };
+
+  const hideSplash = () => {
+    SplashScreen.hide();
+  }
+
   useEffect(() => {
-    // SplashScreen.hide();
+    init();
   }, []);
 
   return (
     <LibraryContextProvider>
       <NavigationContainer>
         <StatusBar hidden={true} />
-        <Tab.Navigator
-          style={styles.tab}
-          screenOptions={({route}) => ({
-            tabBarIcon: ({focused, color, size}) => {
-              let iconName;
-
-              if (route.name === 'Biblioteca') {
-                iconName = focused ? 'book' : 'bookmarks';
-              } else if (route.name === 'Agregar') {
-                iconName = focused ? 'add-circle' : 'add';
-              }
-              return <Icon name={iconName} size={size} color={color} />;
-            },
-          })}
-          tabBarOptions={{
-            activeTintColor: 'blue',
-            inactiveTintColor: 'gray',
-          }}>
-          <Tab.Screen name="Biblioteca" component={LibraryRootStackScreen} />
-          <Tab.Screen name="Agregar" component={AddBook} />
-        </Tab.Navigator>
+        {!server ? <ConfigApp handleCallback={init}/> : (
+          <Tab.Navigator
+            style={styles.tab}
+            screenOptions={({route}) => ({
+              tabBarIcon: ({focused, color, size}) => {
+                let iconName;
+                if (route.name === 'Biblioteca') {
+                  iconName = focused ? 'book' : 'bookmarks';
+                } else if (route.name === 'Agregar') {
+                  iconName = focused ? 'add-circle' : 'add';
+                }
+                return <Icon name={iconName} size={size} color={color} />;
+              },
+            })}
+            tabBarOptions={{
+              activeTintColor: 'blue',
+              inactiveTintColor: 'gray',
+            }}>
+            <Tab.Screen name="Biblioteca" component={LibraryRootStackScreen} />
+            <Tab.Screen name="Agregar" component={AddBook} />
+          </Tab.Navigator>
+        )}
       </NavigationContainer>
     </LibraryContextProvider>
   );
