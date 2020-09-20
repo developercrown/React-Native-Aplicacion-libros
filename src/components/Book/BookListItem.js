@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const SERVER_URI = 'http://192.168.10.101:8088/api';
+const SERVER_URI = 'http://192.168.10.100:8088/api';
 
 const BookListItem = ({book, onPress}) => {
 

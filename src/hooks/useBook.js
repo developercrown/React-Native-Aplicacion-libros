@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
 
-const SERVER_URI = 'http://192.168.10.101:8088/api';
+const SERVER_URI = 'http://192.168.10.100:8088/api';
 
 const GET_BOOK = 'GET_BOOK';
 
