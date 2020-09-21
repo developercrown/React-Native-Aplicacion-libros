@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   View,
@@ -13,28 +13,30 @@ import {
 import useBook from '../../hooks/useBook';
 import nofile from '../../assets/nofile.jpg';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-
-const SERVER_URI = 'http://192.168.10.101:8088/api';
+import GlobalState from '../../contexts/GlobalStateContext';
+import GenericLoading from '../../components/GenericLoading';
+import ViewFullsize from '../../components/ViewFullsize';
 
 const BookEdit = ({navigation, route}) => {
+  const [appConfiguration] = useContext(GlobalState);
   const [title, setTitle] = useState('');
   const [autor, setAutor] = useState('');
+  const {serverURL: server} = appConfiguration;
   const {bookId} = route.params;
-  const {data: book, isLoading} = useBook({bookId});
+  const {data: book, isLoading, isSuccess} = useBook({bookId, server});
 
   if (isLoading) {
     return (
-      <View style={[styles.container, styles.horizontal]}>
-        <ActivityIndicator size="large" animating={true} color="#0373fc" />
-      </View>
+      <ViewFullsize>
+        <GenericLoading label="Cargando libro" />
+      </ViewFullsize>
     );
   }
 
   useEffect(() => {
     setTitle(book.titulo);
     setAutor(book.autor);
-    console.log('actualizando contenido');
-  }, [book, navigation]);
+  }, [book]);
 
   let categorias = [
     {
@@ -58,63 +60,67 @@ const BookEdit = ({navigation, route}) => {
   const handleSelectCategories = (newCategories) => {
     alert('seleccionado');
     console.log(newCategories);
-  }
+  };
 
   const addCategoria = () => {
     navigation.navigate('SelectCategoryModal', {
       category: categorias,
-      onChange: handleSelectCategories
+      onChange: handleSelectCategories,
     });
   };
 
-  return (
-    <SafeAreaView>
-      <ScrollView>
-        <View style={styles.imageSelectorContainer}>
-          {book.uri && (
-            <Image
-              source={{
-                uri: `${SERVER_URI}/libros/image/${book.id}/${book.uri}/${book.uri_key}/thumb`,
-              }}
-              style={styles.image}
-            />
-          )}
+  if (!isLoading && isSuccess) {
+    return (
+      <SafeAreaView>
+        <ScrollView>
+          <View style={styles.imageSelectorContainer}>
+            {book.uri && (
+              <Image
+                source={{
+                  uri: `${appConfiguration.serverURL}/libros/image/${book.id}/${book.uri}/${book.uri_key}/thumb`,
+                }}
+                style={styles.image}
+              />
+            )}
 
-          {!book.uri && <Image source={nofile} style={styles.image} />}
-        </View>
-        <View style={styles.form}>
-          <Text style={styles.label}>Nombre del libro</Text>
-          <TextInput
-            onChangeText={(text) => setTitle(text)}
-            style={styles.textInput}
-            value={title}
-          />
-          <Text style={styles.label}>Nombre del autor</Text>
-          <TextInput
-            onChangeText={(text) => setAutor(text)}
-            style={styles.textInput}
-            value={autor}
-          />
-
-          <View style={styles.categoriasContainer}>
-            <Text style={styles.categoriasTitle}>Categorias:</Text>
-            {categorias.map((item, key) => {
-              return (
-                <Text key={key} style={styles.categoriasText}>
-                  {item.name}
-                </Text>
-              );
-            })}
-            <TouchableOpacity onPress={addCategoria}>
-              <Text>Agregar nueva categoria</Text>
-            </TouchableOpacity>
+            {!book.uri && <Image source={nofile} style={styles.image} />}
           </View>
+          <View style={styles.form}>
+            <Text style={styles.label}>Nombre del libro</Text>
+            <TextInput
+              onChangeText={(text) => setTitle(text)}
+              style={styles.textInput}
+              value={title}
+            />
+            <Text style={styles.label}>Nombre del autor</Text>
+            <TextInput
+              onChangeText={(text) => setAutor(text)}
+              style={styles.textInput}
+              value={autor}
+            />
 
-          <Button title="Actualizar" />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+            <View style={styles.categoriasContainer}>
+              <Text style={styles.categoriasTitle}>Categorias:</Text>
+              {categorias.map((item, key) => {
+                return (
+                  <Text key={key} style={styles.categoriasText}>
+                    {item.name}
+                  </Text>
+                );
+              })}
+              <TouchableOpacity onPress={addCategoria}>
+                <Text>Agregar nueva categoria</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Button title="Actualizar" />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  } else {
+    return <View><Text>Sin contenido</Text></View>
+  }
 };
 
 const styles = StyleSheet.create({

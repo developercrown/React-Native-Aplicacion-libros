@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -16,7 +16,8 @@ import Logo from '../../assets/logo.png';
 
 const ConfigApp = ({handleCallback}) => {
   const {getItem, setItem} = useAsyncStorage('server');
-  const [server, setServer] = useState('http://192.168.10.100:8088/api');
+  const [server, setServer] = useState('');
+  const [serverFactory, setServerFactory] = useState('');
   const [process, setProcess] = useState(false);
   const vibrationTap = () => Vibration.vibrate([35, 20], false);
 
@@ -25,19 +26,45 @@ const ConfigApp = ({handleCallback}) => {
   const handleSubmit = async () => {
     console.log('submitting');
     if (notEmptyText(server)) {
-	setProcess(true);
+      setProcess(true);
       const appConfiguration = {
-        server,
+        serverURL: server,
       };
 
       await setItem(JSON.stringify(appConfiguration));
       let check = await getItem();
-      console.log('server add', server, check);
-      if (server == JSON.parse(check).server) {
-        console.log('returning');
-        handleCallback();
+      // console.log('server add', server, check);
+      if (server == JSON.parse(check).serverURL) {
+        // console.log('returning');
+        if(handleCallback){
+          handleCallback(0);
+        } else{
+          alert('Configuración actualizada');
+          setProcess(false);
+        }
       }
     }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let check = await getItem();
+      console.log('source', check);
+      check = JSON.parse(check);
+      if (!(Object.keys(check).length === 0 && check.constructor === Object)) {
+        check = check.serverURL;
+        setServer(check);
+        setServerFactory(check);
+      } else {
+        setServer('http://192.168.10.100:8088');
+        setServerFactory('http://192.168.10.100:8088');
+      }
+    };
+    fetchData();
+  }, []);
+
+  const checker = () => {
+    return server != serverFactory
   };
 
   return (
@@ -52,7 +79,9 @@ const ConfigApp = ({handleCallback}) => {
         {process ? (
           <View style={styles.processContainer}>
             <ActivityIndicator size="large" animating={true} color="#3aa30d" />
-            <Text style={styles.processContainerText}>Guardando configuración</Text>
+            <Text style={styles.processContainerText}>
+              Guardando configuración
+            </Text>
           </View>
         ) : (
           <View style={styles.mainContainer}>
@@ -61,14 +90,14 @@ const ConfigApp = ({handleCallback}) => {
               style={styles.serverInput}
               maxLength={100}
               onChangeText={(text) => setServer(text)}
-              autoFocus={true}
+              autoFocus={false}
               value={server}
               dataDetectorTypes="link"
               onKeyPress={vibrationTap}
               placeholder="Dirección del servidor de datos"
             />
-            <TouchableOpacity onPress={handleSubmit}>
-              <View style={styles.buttonSubmit}>
+            <TouchableOpacity onPress={checker() ? handleSubmit : null}>
+              <View style={checker() ? styles.buttonSubmitEnabled : styles.buttonSubmitDisabled}>
                 <Text style={styles.buttonSubmitText}>
                   Guardar configuración
                 </Text>
@@ -116,9 +145,9 @@ const styles = StyleSheet.create({
     shadowRadius: 2.22,
     elevation: 2,
   },
-  processContainer:{
-	  flexDirection: "column",
-	  backgroundColor: '#fff',
+  processContainer: {
+    flexDirection: 'column',
+    backgroundColor: '#fff',
     marginTop: 20,
     marginHorizontal: 10,
     borderRadius: 4,
@@ -130,12 +159,12 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
-	elevation: 2,
-	alignItems: 'center'
+    elevation: 2,
+    alignItems: 'center',
   },
-  processContainerText:{
-	  fontSize: 16,
-	  marginTop: 20
+  processContainerText: {
+    fontSize: 16,
+    marginTop: 20,
   },
   serverInput: {
     borderColor: '#1888b5',
@@ -146,8 +175,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 10,
   },
-  buttonSubmit: {
+  buttonSubmitEnabled: {
     backgroundColor: '#3cb55c',
+    marginVertical: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 5,
+    borderRadius: 4,
+  },
+  buttonSubmitDisabled: {
+    backgroundColor: '#81cc94',
     marginVertical: 20,
     shadowColor: '#000',
     shadowOffset: {

@@ -1,21 +1,24 @@
-import React, { useCallback, useMemo, createContext } from 'react';
-import { useQuery,queryCache } from 'react-query';
+import React, { useCallback, useMemo, createContext, useContext } from 'react';
+import { useQuery, queryCache } from 'react-query';
+
+import GlobalState from '../contexts/GlobalStateContext';
 
 const LibraryContext = createContext();
 
 export default LibraryContext;
 
 const GET_BOOKS = 'GET_BOOKS';
-// const SERVER_URI = 'https://crud.upn164.edu.mx/api';
-const SERVER_URI = 'http://192.168.10.100:8088/api';
+let SERVER_URL = null;
 
 async function fetchData() {
-    const response = await fetch(`${SERVER_URI}/libros`);
+    const response = await fetch(`${SERVER_URL}/libros`);
     const json = await response.json();
     return json;
 }
 
 export function LibraryContextProvider({children}) {
+    const [appConfiguration] = useContext(GlobalState);
+    SERVER_URL = appConfiguration.serverURL;
     const { isSuccess, isLoading, data } = useQuery(GET_BOOKS, fetchData);
 
     const invalidateBooksListCache = useCallback(function(){

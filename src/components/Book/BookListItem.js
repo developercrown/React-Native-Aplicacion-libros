@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Image, View, Text, StyleSheet} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-
+import GlobalState from '../../contexts/GlobalStateContext';
 import Icon from 'react-native-ionicons';
 import nofile from '../../assets/nofile.jpg';
 
@@ -63,9 +63,10 @@ const styles = StyleSheet.create({
   }
 });
 
-const SERVER_URI = 'http://192.168.10.100:8088/api';
 
 const BookListItem = ({book, onPress}) => {
+
+  const [appConfiguration] = useContext(GlobalState);
 
   let uri = book.uri;
 
@@ -77,7 +78,7 @@ const BookListItem = ({book, onPress}) => {
     <TouchableOpacity onPress={onPress}>
       <View style={styles.row}>
         <View style={styles.firstRow}>
-          {uri && <Image source={{uri: `${SERVER_URI}/libros/image/${book.id}/${uri}/${book.uri_key}/thumb`}} style={styles.image} />}
+          {uri && <Image source={{uri: `${appConfiguration.serverURL}/libros/image/${book.id}/${uri}/${book.uri_key}/thumb`}} style={styles.image} />}
           {!uri && <Image source={nofile} style={styles.image} />}
         </View>
         <View style={styles.secondRow}>

@@ -1,27 +1,27 @@
-import React, {useLayoutEffect} from 'react';
+import React, {useContext, useLayoutEffect} from 'react';
 import {
-  ActivityIndicator,
   View,
   Text,
   SafeAreaView,
   TouchableOpacity,
-  Button,
   Image,
   StyleSheet,
 } from 'react-native';
 import Icon from 'react-native-ionicons';
 import useBook from '../../hooks/useBook';
-
-const SERVER_URI = 'http://192.168.10.100:8088/api';
+import GlobalState from '../../contexts/GlobalStateContext';
+import nofile from '../../assets/nofile.jpg';
+import GenericLoading from '../../components/GenericLoading';
+import ViewFullsize from '../../components/ViewFullsize';
 
 const BookDetails = ({navigation, route}) => {
+  const [appConfiguration] = useContext(GlobalState);
+  const {serverURL: server} = appConfiguration;
   const {bookId} = route.params;
-  const {data: book, isLoading, isSuccess} = useBook({bookId});
-  console.log(book);
+  const {data: book, isLoading, isSuccess} = useBook({bookId, server});
 
   useLayoutEffect(() => {
     if (isSuccess) {
-      console.log('success', book);
       navigation.setOptions({
         headerRight: () => (
           <TouchableOpacity
@@ -37,34 +37,37 @@ const BookDetails = ({navigation, route}) => {
 
   if (isLoading) {
     return (
-      <View style={[styles.container, styles.horizontal]}>
-        <ActivityIndicator size="large" animating={true} color="#0ff" />
-      </View>
+      <ViewFullsize>
+        <GenericLoading label="Cargando" />
+      </ViewFullsize>
     );
   }
 
-  return (
-    <SafeAreaView>
-      <View style={styles.imageSelectorContainer}>
-        {book.uri && (
-          <Image
-            source={{
-              uri: `${SERVER_URI}/libros/image/${book.id}/${book.uri}/${book.uri_key}/thumb`,
-            }}
-            style={styles.image}
-          />
-        )}
-
-        {!book.uri && <Image source={nofile} style={styles.image} />}
-      </View>
-      <View style={styles.form}>
-        <Text style={styles.label}>Nombre del libro</Text>
-        <Text style={styles.label}>{book.titulo}</Text>
-        <Text style={styles.label}>Nombre del autor</Text>
-        <Text style={styles.label}>{book.autor}</Text>
-      </View>
-    </SafeAreaView>
-  );
+  if (!isLoading && isSuccess) {
+    return (
+      <SafeAreaView>
+        <View style={styles.imageSelectorContainer}>
+          {book.uri && (
+            <Image
+              source={{
+                uri: `${server}/libros/image/${book.id}/${book.uri}/${book.uri_key}/thumb`,
+              }}
+              style={styles.image}
+            />
+          )}
+          {!book.uri && <Image source={nofile} style={styles.image} />}
+        </View>
+        <View style={styles.form}>
+          <Text style={styles.label}>Nombre del libro</Text>
+          <Text style={styles.label}>{book.titulo}</Text>
+          <Text style={styles.label}>Nombre del autor</Text>
+          <Text style={styles.label}>{book.autor}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  } else {
+    return <View><Text>Sin contenido</Text></View>
+  }
 };
 
 const styles = StyleSheet.create({
