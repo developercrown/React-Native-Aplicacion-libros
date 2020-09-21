@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
-  ActivityIndicator,
   View,
   Text,
   SafeAreaView,

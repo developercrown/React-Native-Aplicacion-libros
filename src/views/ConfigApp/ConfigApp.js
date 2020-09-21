@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -8,23 +8,26 @@ import {
   Image,
   View,
   TouchableOpacity,
-  Vibration,
-  ActivityIndicator,
+  ActivityIndicator, ToastAndroid
 } from 'react-native';
 import {useAsyncStorage} from '@react-native-community/async-storage';
 import Logo from '../../assets/logo.png';
+import useVibration from '../../hooks/useVibration';
+import GlobalState from '../../contexts/GlobalStateContext';
+
+import RNRestart from 'react-native-restart';
 
 const ConfigApp = ({handleCallback}) => {
+  const [appConfiguration, setAppConfiguration] = useContext(GlobalState);
   const {getItem, setItem} = useAsyncStorage('server');
   const [server, setServer] = useState('');
   const [serverFactory, setServerFactory] = useState('');
   const [process, setProcess] = useState(false);
-  const vibrationTap = () => Vibration.vibrate([35, 20], false);
-
+  
+  const {vibrateTap, vibrateSuccess} = useVibration();
   const notEmptyText = (text = '') => text.trim() != '';
 
   const handleSubmit = async () => {
-    console.log('submitting');
     if (notEmptyText(server)) {
       setProcess(true);
       const appConfiguration = {
@@ -33,14 +36,20 @@ const ConfigApp = ({handleCallback}) => {
 
       await setItem(JSON.stringify(appConfiguration));
       let check = await getItem();
-      // console.log('server add', server, check);
-      if (server == JSON.parse(check).serverURL) {
-        // console.log('returning');
+      check = JSON.parse(check);
+      if (server == check.serverURL) {
         if(handleCallback){
           handleCallback(0);
         } else{
+          setAppConfiguration(appConfiguration);
+          setServerFactory(appConfiguration.serverURL);
           alert('Configuración actualizada');
-          setProcess(false);
+          vibrateSuccess();
+
+          setTimeout(()=>{
+            ToastAndroid.show("Aplicando cambios en la app", ToastAndroid.SHORT);
+            RNRestart.Restart();
+          }, 1000)
         }
       }
     }
@@ -49,7 +58,6 @@ const ConfigApp = ({handleCallback}) => {
   useEffect(() => {
     const fetchData = async () => {
       let check = await getItem();
-      console.log('source', check);
       check = JSON.parse(check);
       if (!(Object.keys(check).length === 0 && check.constructor === Object)) {
         check = check.serverURL;
@@ -93,7 +101,7 @@ const ConfigApp = ({handleCallback}) => {
               autoFocus={false}
               value={server}
               dataDetectorTypes="link"
-              onKeyPress={vibrationTap}
+              onKeyPress={vibrateTap}
               placeholder="Dirección del servidor de datos"
             />
             <TouchableOpacity onPress={checker() ? handleSubmit : null}>

@@ -1,4 +1,4 @@
-import React, {useEffect, useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {StyleSheet, StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import Icon from 'react-native-ionicons';
@@ -14,6 +14,15 @@ const Tab = createBottomTabNavigator();
 
 const MainApp = ({}) => {
   const [appConfiguration] = useContext(GlobalState);
+
+  useEffect(() => {
+    setInterval(() => {
+      console.log('current', appConfiguration);
+    }, 1000);
+    return () => {
+    }
+  }, [])
+  
   return (
     <LibraryContextProvider>
       <NavigationContainer>

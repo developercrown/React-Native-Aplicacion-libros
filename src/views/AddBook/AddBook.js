@@ -9,7 +9,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ToastAndroid,
-  Vibration,
 } from 'react-native';
 
 import {useMutation} from 'react-query';
@@ -22,6 +21,7 @@ import useLibraryContext from '../../hooks/useLibraryContext';
 import RNFetchBlob from 'react-native-fetch-blob';
 
 import nofile from '../../assets/nofile.jpg';
+import useVibration from '../../hooks/useVibration';
 
 const styles = StyleSheet.create({
   label: {
@@ -117,9 +117,6 @@ async function postData(data) {
     });
 }
 
-const vibrationSingle = () => Vibration.vibrate([35, 20], false);
-const vibrationSuccess = () => Vibration.vibrate([100, 75, 100, 75], false);
-const vibrationError = () => Vibration.vibrate([100, 75, 100, 75, 100, 75], false);
 const toastMessage = (message = 'hello') => ToastAndroid.show(
   message,
   ToastAndroid.SHORT,
@@ -133,10 +130,12 @@ const AddBook = () => {
   const [autor, setAutor] = useState('');
   const [image, setImage] = useState(null);
 
+  const {vibrateTap, vibrateSuccess, vibrateError} = useVibration();
+
   const {invalidateBooksListCache} = useLibraryContext();
 
   async function handleSubmit() {
-    vibrationSingle();
+    vibrateTap();
     if (notEmptyText(title) && notEmptyText(autor)) {
       mutate({
         titulo: title,
@@ -144,7 +143,7 @@ const AddBook = () => {
         image: image ? image : nofile,
       });
     } else {
-      vibrationError();
+      vibrateError();
       toastMessage('No haz completado la información');
     }
   }
@@ -158,23 +157,23 @@ const AddBook = () => {
         setTitle('');
         setAutor('');
         setImage(null);
-        vibrationSuccess();
+        vibrateSuccess();
         toastMessage('Registrado correctamente');
       } else {
         toastMessage('Error al registrar');
-        vibrationError();
+        vibrateError();
       }
     },
   });
 
   const launchImagePicker = () => {
-    vibrationSingle();
+    vibrateTap();
     ImagePicker.showImagePicker(options, (response) => {
       if (response.didCancel) {
         toastMessage('Proceso cancelado');
       } else if (response.error) {
         toastMessage('Ocurrio un error al elegir la imagen');
-        vibrationError();
+        vibrateError();
       } else if (response.customButton) {
         toastMessage('El usuario eligio un boton personalizado');
       } else {
@@ -183,7 +182,7 @@ const AddBook = () => {
           data: response.data,
         };
         setImage(source);
-        vibrationSingle();
+        vibrateTap();
       }
     });
   };
