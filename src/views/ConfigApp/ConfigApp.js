@@ -29,7 +29,7 @@ const ConfigApp = ({ null: handleCallback }) => {
   const notEmptyText = (text = '') => text.trim() != '';
 
   const handleSubmit = async () => {
-    if (notEmptyText(server)) {
+    if (notEmptyText(server) && server != serverFactory) {
       setProcess(true);
       const appConfiguration = {
         serverURL: server,
@@ -48,6 +48,8 @@ const ConfigApp = ({ null: handleCallback }) => {
           vibrateSuccess();
         }
       }
+    } else {
+      ToastAndroid.show('Ingresa una dirección valida', ToastAndroid.SHORT);
     }
   };
 
@@ -105,6 +107,7 @@ const ConfigApp = ({ null: handleCallback }) => {
                 keyboardType="email-address"
                 onKeyPress={vibrateTap}
                 placeholder="Dirección del servidor de datos"
+                onSubmitEditing={handleSubmit}
               />
               <TouchableOpacity onPress={checker() ? handleSubmit : null}>
                 <View style={checker() ? styles.buttonSubmitEnabled : styles.buttonSubmitDisabled}>
