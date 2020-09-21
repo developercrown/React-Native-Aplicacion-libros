@@ -69,5 +69,7 @@ const Home = ({navigation}) => {
 };
 
 //TODO: Siguiente objetivo recarga de la lista jalando
+//TODO: Mover todo lo de vibracion a un hook y reutilizar
+//TODO: cambiar la flatlist a scrollview para tener un refresh control
 
 export default Home;
