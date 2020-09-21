@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -8,23 +8,24 @@ import {
   Image,
   View,
   TouchableOpacity,
-  ActivityIndicator, ToastAndroid
+  ActivityIndicator, ToastAndroid, StatusBar
 } from 'react-native';
-import {useAsyncStorage} from '@react-native-community/async-storage';
+import { useAsyncStorage } from '@react-native-community/async-storage';
 import Logo from '../../assets/logo.png';
 import useVibration from '../../hooks/useVibration';
 import GlobalState from '../../contexts/GlobalStateContext';
-
 import RNRestart from 'react-native-restart';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
-const ConfigApp = ({handleCallback}) => {
+const ConfigApp = ({ null: handleCallback }) => {
+  const [showAlert, setShowAlert] = useState(false);
   const [appConfiguration, setAppConfiguration] = useContext(GlobalState);
-  const {getItem, setItem} = useAsyncStorage('server');
+  const { getItem, setItem } = useAsyncStorage('server');
   const [server, setServer] = useState('');
   const [serverFactory, setServerFactory] = useState('');
   const [process, setProcess] = useState(false);
-  
-  const {vibrateTap, vibrateSuccess} = useVibration();
+
+  const { vibrateTap, vibrateSuccess } = useVibration();
   const notEmptyText = (text = '') => text.trim() != '';
 
   const handleSubmit = async () => {
@@ -38,18 +39,13 @@ const ConfigApp = ({handleCallback}) => {
       let check = await getItem();
       check = JSON.parse(check);
       if (server == check.serverURL) {
-        if(handleCallback){
-          handleCallback(0);
-        } else{
+        if (handleCallback) {
+          setShowAlert(true);
+        } else {
           setAppConfiguration(appConfiguration);
           setServerFactory(appConfiguration.serverURL);
-          alert('Configuración actualizada');
+          setShowAlert(true);
           vibrateSuccess();
-
-          setTimeout(()=>{
-            ToastAndroid.show("Aplicando cambios en la app", ToastAndroid.SHORT);
-            RNRestart.Restart();
-          }, 1000)
         }
       }
     }
@@ -59,13 +55,13 @@ const ConfigApp = ({handleCallback}) => {
     const fetchData = async () => {
       let check = await getItem();
       check = JSON.parse(check);
-      if (!(Object.keys(check).length === 0 && check.constructor === Object)) {
+      if (check && !(Object.keys(check).length === 0 && check.constructor === Object)) {
         check = check.serverURL;
         setServer(check);
         setServerFactory(check);
       } else {
-        setServer('http://192.168.10.100:8088');
-        setServerFactory('http://192.168.10.100:8088');
+        setServer('http://');
+        setServerFactory('http://');
       }
     };
     fetchData();
@@ -75,8 +71,14 @@ const ConfigApp = ({handleCallback}) => {
     return server != serverFactory
   };
 
+  const handleConfirmStoredConfig = () => {
+    ToastAndroid.show("Aplicando cambios en la app", ToastAndroid.SHORT);
+    RNRestart.Restart();
+  }
+
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar hidden={!handleCallback} />
       <ScrollView>
         <View>
           <Text style={styles.configTitle}>Configuración</Text>
@@ -92,28 +94,41 @@ const ConfigApp = ({handleCallback}) => {
             </Text>
           </View>
         ) : (
-          <View style={styles.mainContainer}>
-            <Text>URL del servidor</Text>
-            <TextInput
-              style={styles.serverInput}
-              maxLength={100}
-              onChangeText={(text) => setServer(text)}
-              autoFocus={false}
-              value={server}
-              dataDetectorTypes="link"
-              onKeyPress={vibrateTap}
-              placeholder="Dirección del servidor de datos"
-            />
-            <TouchableOpacity onPress={checker() ? handleSubmit : null}>
-              <View style={checker() ? styles.buttonSubmitEnabled : styles.buttonSubmitDisabled}>
-                <Text style={styles.buttonSubmitText}>
-                  Guardar configuración
+            <View style={styles.mainContainer}>
+              <Text>URL del servidor</Text>
+              <TextInput
+                style={styles.serverInput}
+                maxLength={100}
+                onChangeText={(text) => setServer(text)}
+                autoFocus={false}
+                value={server}
+                keyboardType="email-address"
+                onKeyPress={vibrateTap}
+                placeholder="Dirección del servidor de datos"
+              />
+              <TouchableOpacity onPress={checker() ? handleSubmit : null}>
+                <View style={checker() ? styles.buttonSubmitEnabled : styles.buttonSubmitDisabled}>
+                  <Text style={styles.buttonSubmitText}>
+                    Guardar configuración
                 </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        )}
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
       </ScrollView>
+
+      <AwesomeAlert
+        show={showAlert}
+        title="Exito!"
+        message="Configuración actualizada"
+        closeOnTouchOutside={true}
+        closeOnHardwareBackPress={true}
+        showConfirmButton={true}
+        confirmText="Continuar"
+        confirmButtonColor="#25b04b"
+        onConfirmPressed={handleConfirmStoredConfig}
+        onDismiss={handleConfirmStoredConfig}
+      />
     </SafeAreaView>
   );
 };

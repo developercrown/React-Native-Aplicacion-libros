@@ -15,13 +15,13 @@ const Tab = createBottomTabNavigator();
 const MainApp = ({}) => {
   const [appConfiguration] = useContext(GlobalState);
 
-  useEffect(() => {
-    setInterval(() => {
-      console.log('current', appConfiguration);
-    }, 1000);
-    return () => {
-    }
-  }, [])
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     console.log('current', appConfiguration);
+  //   }, 1000);
+  //   return () => {
+  //   }
+  // }, [])
   
   return (
     <LibraryContextProvider>
