@@ -9,66 +9,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   ToastAndroid,
+  ScrollView,
 } from 'react-native';
-
 import {useMutation} from 'react-query';
 import Icon from 'react-native-ionicons';
-
 import ImagePicker from 'react-native-image-picker';
-
 import useLibraryContext from '../../hooks/useLibraryContext';
-
 import RNFetchBlob from 'react-native-fetch-blob';
-
 import nofile from '../../assets/nofile.jpg';
 import useVibration from '../../hooks/useVibration';
-
-const styles = StyleSheet.create({
-  label: {
-    marginTop: 10,
-  },
-  form: {
-    paddingHorizontal: 16,
-  },
-  textInput: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginVertical: 20,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    marginRight: 10,
-    borderRadius: 100 / 2,
-  },
-  choseImageButton: {
-    marginVertical: 10,
-    backgroundColor: '#ffb300',
-    padding: 10,
-    borderRadius: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-
-    elevation: 2,
-  },
-  choseImageButtonText: {
-    color: '#333',
-    fontWeight: 'bold',
-    marginLeft: 4,
-  },
-  imageSelectorContainer: {
-    marginVertical: 20,
-    alignItems: 'center',
-  },
-});
 
 const options = {
   title: 'Elije la portada',
@@ -108,7 +57,6 @@ async function postData(data) {
       console.log('uploaded', written / total);
     })
     .then((response) => {
-      // console.log('response', response);
       return response;
     })
     .catch((err) => {
@@ -117,11 +65,8 @@ async function postData(data) {
     });
 }
 
-const toastMessage = (message = 'hello') => ToastAndroid.show(
-  message,
-  ToastAndroid.SHORT,
-  ToastAndroid.BOTTOM,
-);;
+const toastMessage = (message = 'hello') =>
+  ToastAndroid.show(message, ToastAndroid.SHORT, ToastAndroid.BOTTOM);
 
 const notEmptyText = (text = '') => text.trim() != '';
 
@@ -129,9 +74,7 @@ const AddBook = () => {
   const [title, setTitle] = useState('');
   const [autor, setAutor] = useState('');
   const [image, setImage] = useState(null);
-
   const {vibrateTap, vibrateSuccess, vibrateError} = useVibration();
-
   const {invalidateBooksListCache} = useLibraryContext();
 
   async function handleSubmit() {
@@ -187,40 +130,168 @@ const AddBook = () => {
     });
   };
 
+  //TODO: mejorar funcionamiento del store implementando mejoras
+
   return (
     <SafeAreaView>
-      <View style={styles.form}>
-        <Text style={styles.label}>Nombre del libro</Text>
-        <TextInput
-          onChangeText={(text) => setTitle(text)}
-          style={styles.textInput}
-          value={title}
-        />
-        <Text style={styles.label}>Nombre del autor</Text>
-        <TextInput
-          onChangeText={(text) => setAutor(text)}
-          style={styles.textInput}
-          value={autor}
-        />
-
-        <View style={styles.imageSelectorContainer}>
-          {image && <Image source={image} style={styles.image} />}
-          {!image && <Image source={nofile} style={styles.image} />}
-          <TouchableOpacity
-            onPress={launchImagePicker}
-            style={styles.choseImageButton}>
-            <Icon name="image" size={30} color="#222" />
-            <Text style={styles.choseImageButtonText}>
-              Seleccionar caratula
-            </Text>
-          </TouchableOpacity>
+      <ScrollView>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Registro de libro</Text>
         </View>
-
-        <Button onPress={handleSubmit} title="Guardar" />
-        {isLoading && <Text>Guardando...</Text>}
-      </View>
+        <View style={styles.portada}>
+          <View style={styles.portadaContainer}>
+            {image && <Image source={image} style={styles.portadaImage} />}
+            {!image && <Image source={nofile} style={styles.portadaImage} />}
+          </View>
+          <View style={styles.imageSelectorContainer}>
+            <TouchableOpacity
+              onPress={launchImagePicker}
+              style={styles.imageSelectorButton}>
+              <Text style={styles.imageSelectorText}>SELECCIONAR CARATULA</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.form}>
+          <View style={styles.inputTextContainer}>
+            <Text style={styles.inputTextLabel}>Nombre del libro</Text>
+            <TextInput
+              onChangeText={(text) => setTitle(text)}
+              style={styles.inputTextBox}
+              value={title}
+            />
+          </View>
+          <View style={styles.inputTextContainer}>
+            <Text style={styles.inputTextLabel}>Nombre del autor</Text>
+            <TextInput
+              onChangeText={(text) => setAutor(text)}
+              style={styles.inputTextBox}
+              value={autor}
+            />
+          </View>
+          <View style={styles.controlsSection}>
+            <TouchableOpacity
+              onPress={handleSubmit}
+              style={styles.submitButton}>
+              <Text style={styles.submitButtonText}>Registrar Libro</Text>
+            </TouchableOpacity>
+          </View>
+          {isLoading && <Text>Guardando...</Text>}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  header: {
+    backgroundColor: '#e8e8e8',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+  },
+  headerTitle: {
+    color: '#333',
+    fontSize: 28,
+  },
+  portada: {
+    backgroundColor: '#d9d9d9',
+    width: '100%',
+    height: 280,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 2,
+    marginBottom: 10,
+  },
+  portadaContainer: {
+    backgroundColor: '#fff',
+    padding: 10,
+    width: 170,
+    height: 170,
+    borderRadius: 170 / 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  portadaImage: {
+    width: 160,
+    height: 160,
+    borderRadius: 160 / 2,
+  },
+  imageSelectorContainer: {
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageSelectorButton: {
+    backgroundColor: '#ffc60d',
+    width: '60%',
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    borderColor: '#aaa',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 2,
+  },
+  imageSelectorText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  form: {
+    paddingHorizontal: 20,
+    minHeight: 250,
+    paddingTop: 10,
+  },
+  inputTextContainer: {
+    marginTop: 20,
+  },
+  inputTextLabel: {
+    fontSize: 16,
+  },
+  inputTextBox: {
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    borderColor: '#bbb',
+    borderBottomWidth: 2,
+    marginTop: 10,
+  },
+  controlsSection: {
+    marginVertical: 20,
+  },
+  submitButton: {
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#189e00',
+    padding: 30,
+    marginTop: 10,
+  },
+  submitButtonText: {
+    color: '#333',
+    textTransform: 'uppercase',
+    color: '#eee',
+    fontSize: 20,
+  },
+});
 
 export default AddBook;
