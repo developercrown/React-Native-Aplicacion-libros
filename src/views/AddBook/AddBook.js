@@ -19,6 +19,12 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import nofile from '../../assets/nofile.jpg';
 import useVibration from '../../hooks/useVibration';
 
+import LinearGradient from 'react-native-linear-gradient';
+import ViewHeaderTitle from '../../components/UI/ViewHeaderTitle';
+
+import InputTextBox from '../../components/UI/InputTextBox';
+import InputButtonSubmit from '../../components/UI/InputButtonSubmit';
+
 const options = {
   title: 'Elije la portada',
   cancelButtonTitle: 'Cancelar',
@@ -112,9 +118,7 @@ const AddBook = () => {
   const launchImagePicker = () => {
     vibrateTap();
     ImagePicker.showImagePicker(options, (response) => {
-      if (response.didCancel) {
-        toastMessage('Proceso cancelado');
-      } else if (response.error) {
+      if (response.didCancel) { } else if (response.error) {
         toastMessage('Ocurrio un error al elegir la imagen');
         vibrateError();
       } else if (response.customButton) {
@@ -130,45 +134,25 @@ const AddBook = () => {
     });
   };
 
-  //TODO: mejorar funcionamiento del store implementando mejoras
+  //TODO: mejorar funcionamiento del store implementando mejoras visuales
 
   return (
     <SafeAreaView>
       <ScrollView>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Registro de libros</Text>
-        </View>
-        <View style={styles.portada}>
+        <ViewHeaderTitle>Registro de libros</ViewHeaderTitle>
+        <LinearGradient colors={['#e3981b', '#e39e2b', '#faa200']} style={styles.portada}>
           <TouchableOpacity onPress={launchImagePicker}>
             <View style={styles.portadaContainer}>
               {image && <Image source={image} style={styles.portadaImage} />}
               {!image && <Image source={nofile} style={styles.portadaImage} />}
             </View>
           </TouchableOpacity>
-        </View>
+        </LinearGradient>
         <View style={styles.form}>
-          <View style={styles.inputTextContainer}>
-            <Text style={styles.inputTextLabel}>Nombre del libro</Text>
-            <TextInput
-              onChangeText={(text) => setTitle(text)}
-              style={styles.inputTextBox}
-              value={title}
-            />
-          </View>
-          <View style={styles.inputTextContainer}>
-            <Text style={styles.inputTextLabel}>Nombre del autor</Text>
-            <TextInput
-              onChangeText={(text) => setAutor(text)}
-              style={styles.inputTextBox}
-              value={autor}
-            />
-          </View>
+          <InputTextBox handleChangeText={(text) => setTitle(text)} value={title} label={'Nombre del libro'}/>
+          <InputTextBox handleChangeText={(text) => setAutor(text)} value={autor} label={'Nombre del autor'}/>
           <View style={styles.controlsSection}>
-            <TouchableOpacity
-              onPress={handleSubmit}
-              style={styles.submitButton}>
-              <Text style={styles.submitButtonText}>Registrar Libro</Text>
-            </TouchableOpacity>
+            <InputButtonSubmit handleClick={handleSubmit} label={"Registrar Libro"}/>
           </View>
           {isLoading && <Text>Guardando...</Text>}
         </View>
@@ -178,26 +162,6 @@ const AddBook = () => {
 };
 
 const styles = StyleSheet.create({
-  header: {
-    backgroundColor: '#132430',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.8,
-    shadowRadius: 3,
-    elevation: 2,
-    zIndex: 2
-  },
-  headerTitle: {
-    color: '#eee',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'left'
-  },
   portada: {
     backgroundColor: '#e39f17',
     borderBottomLeftRadius: 200,
@@ -213,7 +177,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: {
-      width: 0,
+      width: 2,
       height: 2,
     },
     shadowOpacity: 0.23,
@@ -241,7 +205,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   form: {
-    top: -100,
+    top: -110,
     paddingHorizontal: 20,
     minHeight: 250,
   },
@@ -264,15 +228,16 @@ const styles = StyleSheet.create({
     height: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#189e00',
+    backgroundColor: '#132430',
     padding: 30,
     marginTop: 20,
+    borderRadius: 4
   },
   submitButtonText: {
-    color: '#333',
     textTransform: 'uppercase',
-    color: '#eee',
+    color: '#ffc04d',
     fontSize: 20,
+    fontWeight: 'bold'
   },
 });
 

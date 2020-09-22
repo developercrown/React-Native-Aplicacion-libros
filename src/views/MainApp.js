@@ -47,8 +47,9 @@ const MainApp = ({}) => {
             },
           })}
           tabBarOptions={{
-            activeTintColor: 'blue',
-            inactiveTintColor: 'gray',
+            activeTintColor: '#e39f17',
+            inactiveTintColor: '#7bb3db',
+            tabStyle: styles.tabStyle
           }}>
           <Tab.Screen name="Biblioteca" component={LibraryRootStackScreen} />
           <Tab.Screen name="Agregar" component={AddBook} />
@@ -62,7 +63,11 @@ const MainApp = ({}) => {
 const styles = StyleSheet.create({
   tab: {
     padding: 20,
+    backgroundColor: 'red'
   },
+  tabStyle: {
+    backgroundColor: '#132430'
+  }
 });
 
 export default MainApp;
