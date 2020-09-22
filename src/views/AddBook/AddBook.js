@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   ToastAndroid,
   ScrollView,
 } from 'react-native';
-import {useMutation} from 'react-query';
+import { useMutation } from 'react-query';
 import Icon from 'react-native-ionicons';
 import ImagePicker from 'react-native-image-picker';
 import useLibraryContext from '../../hooks/useLibraryContext';
@@ -49,11 +49,11 @@ async function postData(data) {
         type: 'image/jpg',
         data: data.image.data,
       },
-      {name: 'titulo', data: data.titulo},
-      {name: 'autor', data: data.autor},
+      { name: 'titulo', data: data.titulo },
+      { name: 'autor', data: data.autor },
     ],
   )
-    .uploadProgress({interval: 250}, (written, total) => {
+    .uploadProgress({ interval: 250 }, (written, total) => {
       console.log('uploaded', written / total);
     })
     .then((response) => {
@@ -74,8 +74,8 @@ const AddBook = () => {
   const [title, setTitle] = useState('');
   const [autor, setAutor] = useState('');
   const [image, setImage] = useState(null);
-  const {vibrateTap, vibrateSuccess, vibrateError} = useVibration();
-  const {invalidateBooksListCache} = useLibraryContext();
+  const { vibrateTap, vibrateSuccess, vibrateError } = useVibration();
+  const { invalidateBooksListCache } = useLibraryContext();
 
   async function handleSubmit() {
     vibrateTap();
@@ -91,9 +91,9 @@ const AddBook = () => {
     }
   }
 
-  const [mutate, {isLoading}] = useMutation(postData, {
+  const [mutate, { isLoading }] = useMutation(postData, {
     onSuccess: (result) => {
-      const {status} = result.respInfo;
+      const { status } = result.respInfo;
       console.log('success', result);
       if (status === 200 || status == 201) {
         invalidateBooksListCache();
@@ -136,20 +136,15 @@ const AddBook = () => {
     <SafeAreaView>
       <ScrollView>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Registro de libro</Text>
+          <Text style={styles.headerTitle}>Registro de libros</Text>
         </View>
         <View style={styles.portada}>
-          <View style={styles.portadaContainer}>
-            {image && <Image source={image} style={styles.portadaImage} />}
-            {!image && <Image source={nofile} style={styles.portadaImage} />}
-          </View>
-          <View style={styles.imageSelectorContainer}>
-            <TouchableOpacity
-              onPress={launchImagePicker}
-              style={styles.imageSelectorButton}>
-              <Text style={styles.imageSelectorText}>SELECCIONAR CARATULA</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={launchImagePicker}>
+            <View style={styles.portadaContainer}>
+              {image && <Image source={image} style={styles.portadaImage} />}
+              {!image && <Image source={nofile} style={styles.portadaImage} />}
+            </View>
+          </TouchableOpacity>
         </View>
         <View style={styles.form}>
           <View style={styles.inputTextContainer}>
@@ -184,26 +179,36 @@ const AddBook = () => {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#e8e8e8',
-    paddingVertical: 10,
+    backgroundColor: '#132430',
+    paddingVertical: 14,
     paddingHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
+    shadowOpacity: 0.8,
+    shadowRadius: 3,
+    elevation: 2,
+    zIndex: 2
   },
   headerTitle: {
-    color: '#333',
-    fontSize: 28,
+    color: '#eee',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'left'
   },
   portada: {
-    backgroundColor: '#d9d9d9',
-    width: '100%',
-    height: 280,
+    backgroundColor: '#e39f17',
+    borderBottomLeftRadius: 200,
+    borderBottomRightRadius: 200,
+    borderTopLeftRadius: 100,
+    borderTopRightRadius: 100,
+    top: -100,
+    zIndex: 1,
+    width: '94%',
+    alignSelf: 'center',
+    height: 380,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -214,44 +219,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.23,
     shadowRadius: 2.62,
     elevation: 2,
-    marginBottom: 10,
+    alignItems: 'center'
   },
   portadaContainer: {
     backgroundColor: '#fff',
-    padding: 10,
-    width: 170,
-    height: 170,
-    borderRadius: 170 / 2,
+    width: 240,
+    height: 240,
+    borderRadius: 240 / 2,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 80
   },
   portadaImage: {
-    width: 160,
-    height: 160,
-    borderRadius: 160 / 2,
-  },
-  imageSelectorContainer: {
-    marginTop: 10,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  imageSelectorButton: {
-    backgroundColor: '#ffc60d',
-    width: '60%',
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 4,
-    borderColor: '#aaa',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 2,
+    width: 220,
+    height: 220,
+    borderRadius: 220 / 2,
   },
   imageSelectorText: {
     fontSize: 16,
@@ -259,9 +241,9 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   form: {
+    top: -100,
     paddingHorizontal: 20,
     minHeight: 250,
-    paddingTop: 10,
   },
   inputTextContainer: {
     marginTop: 20,
@@ -271,7 +253,7 @@ const styles = StyleSheet.create({
   },
   inputTextBox: {
     backgroundColor: 'rgba(0,0,0,0.05)',
-    borderColor: '#bbb',
+    borderColor: '#e8ba23',
     borderBottomWidth: 2,
     marginTop: 10,
   },
@@ -284,7 +266,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#189e00',
     padding: 30,
-    marginTop: 10,
+    marginTop: 20,
   },
   submitButtonText: {
     color: '#333',
