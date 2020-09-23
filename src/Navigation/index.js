@@ -32,17 +32,17 @@ const LibraryStackScreen = () => {
       <LibraryStack.Screen
         name="BookList"
         component={BookList}
-        options={{title: 'Listado de libros'}}
+        options={{title: 'Listado de libros', headerShown: false}}
       />
       <LibraryStack.Screen
         name="BookDetails"
         component={BookDetails}
-        options={{title: 'Detalles'}}
+        options={{title: 'Detalles', headerShown: false}}
       />
       <LibraryStack.Screen
         name="BookEdit"
         component={BookEdit}
-        options={{title: 'Modo de edición'}}
+        options={{title: 'Modo de edición', headerShown: false}}
       />
     </LibraryStack.Navigator>
   );

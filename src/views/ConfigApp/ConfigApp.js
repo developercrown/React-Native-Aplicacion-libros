@@ -16,6 +16,7 @@ import useVibration from '../../hooks/useVibration';
 import GlobalState from '../../contexts/GlobalStateContext';
 import RNRestart from 'react-native-restart';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import ViewHeaderTitle from '../../components/UI/ViewHeaderTitle';
 
 const ConfigApp = ({ null: handleCallback }) => {
   const [showAlert, setShowAlert] = useState(false);
@@ -80,11 +81,9 @@ const ConfigApp = ({ null: handleCallback }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar hidden={!handleCallback} />
+      <StatusBar backgroundColor="#132430" animated={true} hidden={false} barStyle={'light-content'} />
       <ScrollView>
-        <View>
-          <Text style={styles.configTitle}>Configuración</Text>
-        </View>
+        <ViewHeaderTitle>Configuración</ViewHeaderTitle>
         <View>
           <Image source={Logo} style={styles.logo} />
         </View>
@@ -140,21 +139,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#efefef',
-    paddingTop: 10,
-    paddingHorizontal: 4,
   },
   logo: {
     width: 180,
     height: 180,
     alignSelf: 'center',
-  },
-  configTitle: {
-    color: '#333',
-    fontWeight: 'bold',
-    fontSize: 32,
-    marginLeft: 10,
-    marginTop: 10,
-    marginBottom: 20,
   },
   mainContainer: {
     backgroundColor: '#fff',

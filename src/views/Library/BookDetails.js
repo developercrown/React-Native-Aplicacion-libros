@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  ScrollView,
+  StatusBar
 } from 'react-native';
 import Icon from 'react-native-ionicons';
 import useBook from '../../hooks/useBook';
@@ -13,6 +15,7 @@ import GlobalState from '../../contexts/GlobalStateContext';
 import nofile from '../../assets/nofile.jpg';
 import GenericLoading from '../../components/GenericLoading';
 import ViewFullsize from '../../components/ViewFullsize';
+import ViewHeaderTitle from '../../components/UI/ViewHeaderTitle';
 
 const BookDetails = ({navigation, route}) => {
   const [appConfiguration] = useContext(GlobalState);
@@ -46,27 +49,35 @@ const BookDetails = ({navigation, route}) => {
   if (!isLoading && isSuccess) {
     return (
       <SafeAreaView>
-        <View style={styles.imageSelectorContainer}>
-          {book.uri && (
-            <Image
-              source={{
-                uri: `${server}/libros/image/${book.id}/${book.uri}/${book.uri_key}/thumb`,
-              }}
-              style={styles.image}
-            />
-          )}
-          {!book.uri && <Image source={nofile} style={styles.image} />}
-        </View>
-        <View style={styles.form}>
-          <Text style={styles.label}>Nombre del libro</Text>
-          <Text style={styles.label}>{book.titulo}</Text>
-          <Text style={styles.label}>Nombre del autor</Text>
-          <Text style={styles.label}>{book.autor}</Text>
-        </View>
+        <StatusBar backgroundColor="#132430" animated={true} hidden={false} barStyle={'light-content'} />
+        <ScrollView>
+          <ViewHeaderTitle>Detalles del libro</ViewHeaderTitle>
+          <View style={styles.imageSelectorContainer}>
+            {book.uri && (
+              <Image
+                source={{
+                  uri: `${server}/libros/image/${book.id}/${book.uri}/${book.uri_key}/thumb`,
+                }}
+                style={styles.image}
+              />
+            )}
+            {!book.uri && <Image source={nofile} style={styles.image} />}
+          </View>
+          <View style={styles.form}>
+            <Text style={styles.label}>Nombre del libro</Text>
+            <Text style={styles.label}>{book.titulo}</Text>
+            <Text style={styles.label}>Nombre del autor</Text>
+            <Text style={styles.label}>{book.autor}</Text>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   } else {
-    return <View><Text>Sin contenido</Text></View>
+    return (
+      <View>
+        <Text>Sin contenido</Text>
+      </View>
+    );
   }
 };
 

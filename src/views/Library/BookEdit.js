@@ -8,6 +8,7 @@ import {
   Image,
   StyleSheet,
   ScrollView,
+  StatusBar
 } from 'react-native';
 import useBook from '../../hooks/useBook';
 import nofile from '../../assets/nofile.jpg';
@@ -71,6 +72,7 @@ const BookEdit = ({navigation, route}) => {
   if (!isLoading && isSuccess) {
     return (
       <SafeAreaView>
+        <StatusBar backgroundColor="#132430" animated={true} hidden={false} barStyle={'light-content'} />
         <ScrollView>
           <View style={styles.imageSelectorContainer}>
             {book.uri && (

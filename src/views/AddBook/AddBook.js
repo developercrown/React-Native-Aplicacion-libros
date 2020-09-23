@@ -192,53 +192,21 @@ const styles = StyleSheet.create({
     borderRadius: 240 / 2,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 80
+    marginTop: 80,
   },
   portadaImage: {
     width: 220,
     height: 220,
     borderRadius: 220 / 2,
   },
-  imageSelectorText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-  },
   form: {
     top: -110,
     paddingHorizontal: 20,
     minHeight: 250,
   },
-  inputTextContainer: {
-    marginTop: 20,
-  },
-  inputTextLabel: {
-    fontSize: 16,
-  },
-  inputTextBox: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderColor: '#e8ba23',
-    borderBottomWidth: 2,
-    marginTop: 10,
-  },
   controlsSection: {
-    marginVertical: 20,
-  },
-  submitButton: {
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#132430',
-    padding: 30,
-    marginTop: 20,
-    borderRadius: 4
-  },
-  submitButtonText: {
-    textTransform: 'uppercase',
-    color: '#ffc04d',
-    fontSize: 20,
-    fontWeight: 'bold'
-  },
+    marginVertical: 20
+  }
 });
 
 export default AddBook;

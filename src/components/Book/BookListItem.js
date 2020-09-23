@@ -2,38 +2,28 @@ import React, {useContext} from 'react';
 import {Image, View, Text, StyleSheet} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import GlobalState from '../../contexts/GlobalStateContext';
-import Icon from 'react-native-ionicons';
 import nofile from '../../assets/nofile.jpg';
 
 const styles = StyleSheet.create({
   row: {
-    marginBottom: 4,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
-    borderBottomWidth: 1,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+    borderColor: '#e6e6e6',
+    borderWidth: 1,
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    flex: 1,
-    paddingVertical: 4,
-    paddingLeft: 4
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 100
   },
   firstRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    width: 50,
+    width: 60,
     marginRight: 8,
   },
   secondRow: {
     flexDirection: 'column',
-    flex: 7,
-  },
-
-  thirdRow: {
-    alignItems: 'center',
-    flexDirection: 'column',
-    flex: 1,
-    height: '100%',
-    paddingRight: 10,
-    paddingTop: 8
+    width: '75%',
   },
 
   contentRow: {
@@ -44,9 +34,9 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     alignSelf: 'center',
   },
   icon: {
@@ -86,12 +76,8 @@ const BookListItem = ({book, onPress}) => {
             <Text>{book.titulo}</Text>
           </View>
           <View style={styles.contentRow}>
-            <Icon name="library-outline" />
             <Text style={styles.boldText}>Author: {book.autor}</Text>
           </View>
-        </View>
-        <View style={styles.thirdRow}>
-          <Icon name="arrow-dropright" style={styles.icon} />
         </View>
       </View>
     </TouchableOpacity>

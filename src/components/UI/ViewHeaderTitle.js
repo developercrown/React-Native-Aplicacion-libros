@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
 
 const ViewHeaderTitle = ({children}) => {
     return <View style={styles.header}>
-        <StatusBar backgroundColor="#132430" animated={true} barStyle={'light-content'} />
         <Text style={styles.headerTitle}>{children}</Text>
     </View>;
 }

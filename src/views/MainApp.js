@@ -22,15 +22,11 @@ const MainApp = ({}) => {
   //   return () => {
   //   }
   // }, [])
-  
+
   return (
     <LibraryContextProvider>
       <NavigationContainer>
-        <StatusBar
-          hidden={false}
-          backgroundColor="#eee"
-          barStyle="dark-content"
-        />
+        <StatusBar backgroundColor="#132430" animated={true} barStyle={'light-content'} />
         <Tab.Navigator
           style={styles.tab}
           screenOptions={({route}) => ({
@@ -62,11 +58,13 @@ const MainApp = ({}) => {
 
 const styles = StyleSheet.create({
   tab: {
-    padding: 20,
-    backgroundColor: 'red'
+    padding: 0,
+    margin: 0
   },
   tabStyle: {
-    backgroundColor: '#132430'
+    backgroundColor: '#132430',
+    padding: 0,
+    margin: 0
   }
 });
 
