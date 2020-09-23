@@ -1,6 +1,13 @@
-import React, {useContext, useState} from 'react';
-import {View, Text, StyleSheet, StatusBar, TextInput} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import React, {useContext, useState, useCallback} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  StatusBar,
+  TextInput,
+  RefreshControl,
+  FlatList,
+} from 'react-native';
 import BookListItem from '../../components/Book/BookListItem';
 import GenericLoading from '../../components/GenericLoading';
 import ViewFullsize from '../../components/ViewFullsize';
@@ -41,7 +48,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2.62,
     elevation: 2,
     flexDirection: 'row',
-    justifyContent:'flex-start',
+    justifyContent: 'flex-start',
   },
   iconSearchBox: {
     backgroundColor: 'transparent',
@@ -50,7 +57,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     marginTop: 4,
     width: 32,
-    flex: 1
+    flex: 1,
   },
   inputSearchBox: {
     flex: 1,
@@ -58,26 +65,41 @@ const styles = StyleSheet.create({
     minWidth: '93%',
     alignSelf: 'flex-start',
     padding: 4,
-    textAlign: 'left'
+    textAlign: 'left',
   },
   labelResults: {
     marginLeft: 32,
     marginTop: 4,
     marginBottom: 8,
     fontSize: 24,
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+  },
 });
 
 const Home = ({navigation}) => {
   const [appConfiguration] = useContext(GlobalState);
   const [searchText, setSearchText] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      console.log('recargando');
+      invalidateBooksListCache();
+      setRefreshing(false);
+    }, 2000);
+  });
 
   const handleOnPress = ({bookId}) => {
     navigation.navigate('BookDetails', {bookId});
   };
 
-  const {isSuccess, isLoading, books} = useLibraryContext(appConfiguration);
+  const {
+    isSuccess,
+    isLoading,
+    books,
+    invalidateBooksListCache,
+  } = useLibraryContext(appConfiguration);
 
   if (isLoading) {
     return (
@@ -110,7 +132,7 @@ const Home = ({navigation}) => {
                 onChangeText={(text) => setSearchText(text)}
                 style={styles.inputSearchBox}
                 value={searchText}
-                placeholder='Buscar'
+                placeholder="Buscar"
               />
             </View>
           </View>
@@ -120,6 +142,9 @@ const Home = ({navigation}) => {
         </View>
         <View style={styles.content}>
           <FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
             data={isSuccess ? books : []}
             renderItem={({item}) => (
               <BookListItem
@@ -128,15 +153,7 @@ const Home = ({navigation}) => {
               />
             )}
             keyExtractor={(item, index) => `list-item${item}${index}`}
-            ListEmptyComponent={
-              <View>
-                {isLoading && (
-                  <View>
-                    <Text>Cargando Libros...</Text>
-                  </View>
-                )}
-              </View>
-            }></FlatList>
+          />
         </View>
       </View>
     );
