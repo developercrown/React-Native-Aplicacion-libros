@@ -15,6 +15,7 @@ import useLibraryContext from '../../hooks/useLibraryContext';
 import GlobalState from '../../contexts/GlobalStateContext';
 import ViewHeaderTitle from '../../components/UI/ViewHeaderTitle';
 import Icon from 'react-native-ionicons';
+import { ListadoLibrosComponent } from './ListadoLibrosComponent';
 
 const styles = StyleSheet.create({
   results: {
@@ -141,7 +142,7 @@ const Home = ({navigation}) => {
           <Text style={styles.labelResults}>Resultados:</Text>
         </View>
         <View style={styles.content}>
-          <FlatList
+          {/* <FlatList
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
@@ -153,7 +154,8 @@ const Home = ({navigation}) => {
               />
             )}
             keyExtractor={(item, index) => `list-item${item}${index}`}
-          />
+          /> */}
+          <ListadoLibrosComponent />
         </View>
       </View>
     );
