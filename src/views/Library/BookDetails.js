@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
   ScrollView,
-  StatusBar
+  StatusBar,
 } from 'react-native';
 import Icon from 'react-native-ionicons';
 import useBook from '../../hooks/useBook';
@@ -16,6 +16,7 @@ import nofile from '../../assets/nofile.jpg';
 import GenericLoading from '../../components/GenericLoading';
 import ViewFullsize from '../../components/ViewFullsize';
 import ViewHeaderTitle from '../../components/UI/ViewHeaderTitle';
+import LinearGradient from 'react-native-linear-gradient';
 
 const BookDetails = ({navigation, route}) => {
   const [appConfiguration] = useContext(GlobalState);
@@ -49,25 +50,36 @@ const BookDetails = ({navigation, route}) => {
   if (!isLoading && isSuccess) {
     return (
       <SafeAreaView>
-        <StatusBar backgroundColor="#132430" animated={true} hidden={false} barStyle={'light-content'} />
+        <StatusBar
+          backgroundColor="#132430"
+          animated={true}
+          hidden={false}
+          barStyle={'light-content'}
+        />
         <ScrollView>
-          <ViewHeaderTitle>Detalles del libro</ViewHeaderTitle>
-          <View style={styles.imageSelectorContainer}>
-            {book.uri && (
-              <Image
-                source={{
+          <ViewHeaderTitle label="Detalles del libro">
+            <TouchableOpacity onPress={()=>navigation.navigate('BookEdit', {bookId: book.id})}>
+              <Icon name="create" color="#fff" size={28} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.goBack()} style={{marginLeft: 32}}>
+              <Icon name="arrow-back" color="#fff" size={28} />
+            </TouchableOpacity>
+          </ViewHeaderTitle>
+          <LinearGradient
+            colors={['#e3981b', '#e39e2b', '#faa200']}
+            style={styles.portada}>
+            <View style={styles.portadaContainer}>
+              {book.uri && <Image source={{
                   uri: `${server}/libros/image/${book.id}/${book.uri}/${book.uri_key}/thumb`,
-                }}
-                style={styles.image}
-              />
-            )}
-            {!book.uri && <Image source={nofile} style={styles.image} />}
-          </View>
+                }} style={styles.portadaImage} />}
+              {!book.uri && <Image source={nofile} style={styles.portadaImage} />}
+            </View>
+          </LinearGradient>
           <View style={styles.form}>
             <Text style={styles.label}>Nombre del libro</Text>
-            <Text style={styles.label}>{book.titulo}</Text>
+            <Text style={styles.valueText}>{book.titulo}</Text>
             <Text style={styles.label}>Nombre del autor</Text>
-            <Text style={styles.label}>{book.autor}</Text>
+            <Text style={styles.valueText}>{book.autor}</Text>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -82,62 +94,59 @@ const BookDetails = ({navigation, route}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  horizontal: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 10,
-  },
-  label: {
-    marginTop: 10,
-  },
-  form: {
-    paddingHorizontal: 16,
-  },
-  textInput: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginVertical: 20,
-  },
-  image: {
-    width: 200,
-    height: 200,
-    marginRight: 10,
-    borderRadius: 200 / 2,
-  },
-  choseImageButton: {
-    marginVertical: 10,
-    backgroundColor: '#ffb300',
-    padding: 10,
-    borderRadius: 4,
-    flexDirection: 'row',
+  portada: {
+    backgroundColor: '#e39f17',
+    borderBottomLeftRadius: 200,
+    borderBottomRightRadius: 200,
+    borderTopLeftRadius: 100,
+    borderTopRightRadius: 100,
+    top: -100,
+    zIndex: 1,
+    width: '94%',
+    alignSelf: 'center',
+    height: 380,
     alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: {
-      width: 0,
+      width: 2,
       height: 2,
     },
     shadowOpacity: 0.23,
     shadowRadius: 2.62,
-
     elevation: 2,
+    alignItems: 'center'
   },
-  choseImageButtonText: {
-    color: '#333',
-    fontWeight: 'bold',
-    marginLeft: 4,
-  },
-  imageSelectorContainer: {
-    marginVertical: 20,
+  portadaContainer: {
+    backgroundColor: '#fff',
+    width: 240,
+    height: 240,
+    borderRadius: 240 / 2,
+    justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 80,
   },
-  editButton: {
-    marginRight: 16,
+  portadaImage: {
+    width: 220,
+    height: 220,
+    borderRadius: 220 / 2,
   },
+  form: {
+    top: -80,
+    paddingHorizontal: 20,
+    minHeight: 250,
+  },
+  label: {
+    fontWeight: 'bold',
+    fontSize: 24,
+    textAlign: 'center',
+    marginBottom: 10
+  },
+  valueText: {
+    fontSize: 18,
+    marginBottom: 14,
+    textAlign: 'center'
+  }
 });
 
 export default BookDetails;

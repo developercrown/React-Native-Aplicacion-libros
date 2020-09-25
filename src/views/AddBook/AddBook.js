@@ -139,7 +139,7 @@ const AddBook = () => {
   return (
     <SafeAreaView>
       <ScrollView>
-        <ViewHeaderTitle>Registro de libros</ViewHeaderTitle>
+        <ViewHeaderTitle label="Registro de libros"></ViewHeaderTitle>
         <LinearGradient colors={['#e3981b', '#e39e2b', '#faa200']} style={styles.portada}>
           <TouchableOpacity onPress={launchImagePicker}>
             <View style={styles.portadaContainer}>

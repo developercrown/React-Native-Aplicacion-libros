@@ -8,15 +8,17 @@ import {
   Image,
   StyleSheet,
   ScrollView,
-  StatusBar
+  StatusBar,
+  TouchableOpacity,
 } from 'react-native';
 import useBook from '../../hooks/useBook';
 import nofile from '../../assets/nofile.jpg';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 import GlobalState from '../../contexts/GlobalStateContext';
 import GenericLoading from '../../components/GenericLoading';
 import ViewFullsize from '../../components/ViewFullsize';
-
+import ViewHeaderTitle from '../../components/UI/ViewHeaderTitle';
+import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-ionicons';
 const BookEdit = ({navigation, route}) => {
   const [appConfiguration] = useContext(GlobalState);
   const [title, setTitle] = useState('');
@@ -72,20 +74,38 @@ const BookEdit = ({navigation, route}) => {
   if (!isLoading && isSuccess) {
     return (
       <SafeAreaView>
-        <StatusBar backgroundColor="#132430" animated={true} hidden={false} barStyle={'light-content'} />
+        <StatusBar
+          backgroundColor="#132430"
+          animated={true}
+          hidden={false}
+          barStyle={'light-content'}
+        />
         <ScrollView>
-          <View style={styles.imageSelectorContainer}>
-            {book.uri && (
-              <Image
-                source={{
-                  uri: `${appConfiguration.serverURL}/libros/image/${book.id}/${book.uri}/${book.uri_key}/thumb`,
-                }}
-                style={styles.image}
-              />
-            )}
+          <ViewHeaderTitle label="Modo de edición">
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{marginLeft: 32}}>
+              <Icon name="arrow-back" color="#fff" size={28} />
+            </TouchableOpacity>
+          </ViewHeaderTitle>
+          <LinearGradient
+            colors={['#e3981b', '#e39e2b', '#faa200']}
+            style={styles.portada}>
+            <View style={styles.portadaContainer}>
+              {book.uri && (
+                <Image
+                  source={{
+                    uri: `${server}/libros/image/${book.id}/${book.uri}/${book.uri_key}/thumb`,
+                  }}
+                  style={styles.portadaImage}
+                />
+              )}
+              {!book.uri && (
+                <Image source={nofile} style={styles.portadaImage} />
+              )}
+            </View>
+          </LinearGradient>
 
-            {!book.uri && <Image source={nofile} style={styles.image} />}
-          </View>
           <View style={styles.form}>
             <Text style={styles.label}>Nombre del libro</Text>
             <TextInput
@@ -120,11 +140,57 @@ const BookEdit = ({navigation, route}) => {
       </SafeAreaView>
     );
   } else {
-    return <View><Text>Sin contenido</Text></View>
+    return (
+      <View>
+        <Text>Sin contenido</Text>
+      </View>
+    );
   }
 };
 
 const styles = StyleSheet.create({
+  portada: {
+    backgroundColor: '#e39f17',
+    borderBottomLeftRadius: 200,
+    borderBottomRightRadius: 200,
+    borderTopLeftRadius: 100,
+    borderTopRightRadius: 100,
+    top: -100,
+    zIndex: 1,
+    width: '94%',
+    alignSelf: 'center',
+    height: 380,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 2,
+    alignItems: 'center',
+  },
+  portadaContainer: {
+    backgroundColor: '#fff',
+    width: 240,
+    height: 240,
+    borderRadius: 240 / 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 80,
+  },
+  portadaImage: {
+    width: 220,
+    height: 220,
+    borderRadius: 220 / 2,
+  },
+  form: {
+    top: -80,
+    paddingHorizontal: 20,
+    minHeight: 250,
+  },
   categoriasContainer: {
     marginVertical: 20,
   },
@@ -149,9 +215,6 @@ const styles = StyleSheet.create({
   },
   label: {
     marginTop: 10,
-  },
-  form: {
-    paddingHorizontal: 16,
   },
   textInput: {
     height: 40,

@@ -83,7 +83,7 @@ const ConfigApp = ({ null: handleCallback }) => {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#132430" animated={true} hidden={false} barStyle={'light-content'} />
       <ScrollView>
-        <ViewHeaderTitle>Configuración</ViewHeaderTitle>
+        <ViewHeaderTitle label={'Configuración'}></ViewHeaderTitle>
         <View>
           <Image source={Logo} style={styles.logo} />
         </View>

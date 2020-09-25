@@ -6,7 +6,7 @@ import {
   StatusBar,
   TextInput,
   RefreshControl,
-  FlatList,
+  ScrollView,
 } from 'react-native';
 import BookListItem from '../../components/Book/BookListItem';
 import GenericLoading from '../../components/GenericLoading';
@@ -15,7 +15,7 @@ import useLibraryContext from '../../hooks/useLibraryContext';
 import GlobalState from '../../contexts/GlobalStateContext';
 import ViewHeaderTitle from '../../components/UI/ViewHeaderTitle';
 import Icon from 'react-native-ionicons';
-import { ListadoLibrosComponent } from './ListadoLibrosComponent';
+import ListadoLibrosComponent from './ListadoLibrosComponent';
 
 const styles = StyleSheet.create({
   results: {
@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
   content: {
     paddingTop: 0,
     paddingBottom: 100,
+    height: '86%',
   },
   searchBarContainer: {
     height: 54,
@@ -75,6 +76,32 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
+  loadingContainerSection: {
+    margin: 0,
+    padding: 0,
+  },
+  loadingView: {
+    flex: 1,
+    backgroundColor: 'red',
+    alignItems: 'center',
+    width: '100%',
+  },
+  loadingContainer: {
+    width: '100%',
+    height: '92%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
+    margin: 0,
+  },
+  notResults: {
+    marginTop: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  notResultsText: {
+    fontSize: 28,
+  },
 });
 
 const Home = ({navigation}) => {
@@ -104,9 +131,18 @@ const Home = ({navigation}) => {
 
   if (isLoading) {
     return (
-      <ViewFullsize>
-        <GenericLoading label="Cargando libros" />
-      </ViewFullsize>
+      <View style={[styles.loadingContainerSection]}>
+        <StatusBar
+          backgroundColor="#132430"
+          animated={true}
+          hidden={false}
+          barStyle={'light-content'}
+        />
+        <ViewHeaderTitle label="Listado general"></ViewHeaderTitle>
+        <View style={styles.loadingContainer}>
+          <GenericLoading label="Cargando libros" />
+        </View>
+      </View>
     );
   } else if (isSuccess && !isLoading) {
     return (
@@ -117,7 +153,7 @@ const Home = ({navigation}) => {
           hidden={false}
           barStyle={'light-content'}
         />
-        <ViewHeaderTitle>Listado general</ViewHeaderTitle>
+        <ViewHeaderTitle label="Listado general"></ViewHeaderTitle>
         <View style={styles.searchBarContainer}>
           <View style={styles.searchInputBox}>
             <View>
@@ -142,35 +178,43 @@ const Home = ({navigation}) => {
           <Text style={styles.labelResults}>Resultados:</Text>
         </View>
         <View style={styles.content}>
-          {/* <FlatList
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-            data={isSuccess ? books : []}
-            renderItem={({item}) => (
-              <BookListItem
-                book={item}
-                onPress={() => handleOnPress({bookId: item.id})}
-              />
-            )}
-            keyExtractor={(item, index) => `list-item${item}${index}`}
-          /> */}
-          <ListadoLibrosComponent />
+          {isLoading ? (
+            <GenericLoading>Cargando información</GenericLoading>
+          ) : (
+            <ListadoLibrosComponent
+              data={isSuccess ? books : []}
+              onRefresh={onRefresh}
+              refreshing={refreshing}
+              navigation={navigation}
+            />
+          )}
         </View>
       </View>
     );
   } else {
     return (
-      <ViewFullsize>
-        <Text>No hay resultados</Text>
-      </ViewFullsize>
+      <View style={[styles.loadingContainerSection]}>
+        <StatusBar
+          backgroundColor="#132430"
+          animated={true}
+          hidden={false}
+          barStyle={'light-content'}
+        />
+        <ViewHeaderTitle label="Listado general"></ViewHeaderTitle>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          <View style={styles.notResults}>
+            <Icon name="alert" size={100} color="#333"></Icon>
+            <Text style={styles.notResultsText}>Sin resultados</Text>
+          </View>
+        </ScrollView>
+      </View>
     );
   }
 };
 
-//TODO: Siguiente objetivo recarga de la lista jalando
-//TODO: lista con opciónes en el elemento al hacer swipe
 //TODO: aplicar hook de vibración
-//TODO: cambiar la flatlist a scrollview para tener un refresh control
 
 export default Home;
